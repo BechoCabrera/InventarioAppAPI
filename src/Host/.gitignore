@@ -1,0 +1,7 @@
+# Ignorar archivos y directorios de Visual Studio
+.vs/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.userprefs
