@@ -1,23 +1,34 @@
+using InventarioBackend.src.Infrastructure.Data;
+using InventarioBackend.src.Infrastructure.Data.Repositories.Security;
+using InventarioBackend.src.Core.Domain.Security.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using InventarioBackend.src.Core.Application.Security.Interfaces;
+using InventarioBackend.src.Core.Application.Security.Services;
+using Microsoft.EntityFrameworkCore;
+using InventarioBackend.src.Core.Infrastructure.Data.Security;
 var builder = WebApplication.CreateBuilder(args);
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+// Cadena de conexión (ajústala a tu base de datos)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=(localdb)\\mssqllocaldb;Database=InventarioDB;Trusted_Connection=True;";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(MyAllowSpecificOrigins, policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")  // URL de tu frontend Angular
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();  // Permite credenciales si las necesitas
-    });
-});
+// Agregar DbContext con SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
+// Registrar repositorios
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Aquí agregar ProductRepository, etc.
+// builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Registrar servicios de aplicación
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+// builder.Services.AddScoped<IProductService, ProductService>();
+
+// Configurar autenticación JWT (ejemplo básico)
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"] ?? "TuClaveSuperSecretaDeAlMenos32Caracteres!");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -25,32 +36,46 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true;
+    options.RequireHttpsMetadata = false; // En producción poner true
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("TuClaveSuperSecretaDeAlMenos32Caracteres!")),
+        IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = false,
         ValidateAudience = false,
-        ClockSkew = TimeSpan.Zero // No hay margen de error en la expiración
+        ClockSkew = TimeSpan.Zero
     };
 });
 
-builder.Services.AddAuthorization();
+// Agregar controladores y Swagger
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
+// Opcional: configurar CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularClient", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")  // Origen exacto que usas en Angular
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();  // Muy importante para que funcione con credenciales
+    });
+});
+builder.Services.AddScoped<ITokenService, TokenService>();
 var app = builder.Build();
 
-// Configura CORS para el uso del frontend
-app.UseCors(MyAllowSpecificOrigins);  // Aplica la política de CORS
-
-app.UseStaticFiles(new StaticFileOptions
+if (app.Environment.IsDevelopment())
 {
-    RequestPath = "/i18n", // Ruta para los archivos estáticos
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "i18n"))
-});
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularClient");
 
 app.UseAuthentication();
 app.UseAuthorization();

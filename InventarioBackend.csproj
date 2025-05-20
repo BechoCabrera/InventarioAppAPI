@@ -7,17 +7,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src\Infrastructure\Configurations\**" />
+    <Compile Remove="src\Infrastructure\Mapping\**" />
+    <Compile Remove="src\Infrastructure\Repositories\**" />
+    <Content Remove="src\Infrastructure\Configurations\**" />
+    <Content Remove="src\Infrastructure\Mapping\**" />
+    <Content Remove="src\Infrastructure\Repositories\**" />
+    <EmbeddedResource Remove="src\Infrastructure\Configurations\**" />
+    <EmbeddedResource Remove="src\Infrastructure\Mapping\**" />
+    <EmbeddedResource Remove="src\Infrastructure\Repositories\**" />
+    <None Remove="src\Infrastructure\Configurations\**" />
+    <None Remove="src\Infrastructure\Mapping\**" />
+    <None Remove="src\Infrastructure\Repositories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.10.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.10.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="src\Core\Application\Clients\DTOs\" />
+    <Folder Include="src\Core\Application\Clients\Interfaces\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\DTOs\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Handlers\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Specs\" />
-    <Folder Include="src\Core\Application\Clients\" />
     <Folder Include="src\Core\Application\Sales\" />
     <Folder Include="src\Core\Application\Products\Category\DTOs\" />
     <Folder Include="src\Core\Application\Products\Category\Handlers\" />
@@ -28,15 +46,20 @@
     <Folder Include="src\Core\Application\Products\Supplier\DTOs\" />
     <Folder Include="src\Core\Application\Products\Supplier\Handlers\" />
     <Folder Include="src\Core\Application\Products\Supplier\Specs\" />
-    <Folder Include="src\Core\Application\Security\Login\Handlers\" />
-    <Folder Include="src\Core\Application\Security\Login\Specs\" />
-    <Folder Include="src\Core\Shared\" />
-    <Folder Include="src\Host\Configurations\" />
-    <Folder Include="src\Infrastructure\Data\" />
-    <Folder Include="src\Infrastructure\Configurations\" />
-    <Folder Include="src\Infrastructure\Mapping\" />
-    <Folder Include="src\Infrastructure\Services\" />
-    <Folder Include="src\Infrastructure\Repositories\" />
+    <Folder Include="src\Core\Domain\Inventory\Entities\" />
+    <Folder Include="src\Core\Domain\Inventory\Interfaces\" />
+    <Folder Include="src\Core\Domain\Inventory\Services\" />
+    <Folder Include="src\Core\Domain\Sales\Interfaces\" />
+    <Folder Include="src\Core\Domain\Sales\Services\" />
+    <Folder Include="src\Core\Shared\Entities\" />
+    <Folder Include="src\Core\Shared\Interfaces\" />
+    <Folder Include="src\Core\Shared\Services\" />
+    <Folder Include="src\Tests\IntegrationTests\" />
+    <Folder Include="src\Tests\UnitTests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="InventarioBackend.sln" />
   </ItemGroup>
 
 </Project>
