@@ -1,0 +1,20 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+
+# Rider IDE
+.idea/
+
+# Logs
+*.log
+
+# Packages
+*.nupkg
+packages/
