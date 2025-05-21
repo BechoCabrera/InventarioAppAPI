@@ -1,32 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using InventarioBackend.src.Core.Application.Security.DTOs;
+﻿using InventarioBackend.src.Core.Application.Security.DTOs;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
-namespace InventarioBackend.Host.Controllers
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/auth")]
-    public class AuthController : ControllerBase
+    private readonly IAuthenticationService _authService;
+
+    public AuthController(IAuthenticationService authService)
     {
-        private readonly IAuthenticationService _authenticationService;
+        _authService = authService;
+    }
 
-        public AuthController(IAuthenticationService authenticationService)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        try
         {
-            _authenticationService = authenticationService;
+            var tokenResponse = await _authService.LoginAsync(request);
+            return Ok(tokenResponse);
         }
-
-        [HttpPost("api/login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        catch (UnauthorizedAccessException)
         {
-            try
-            {
-                var response = await _authenticationService.LoginAsync(request);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized(new { message = "Credenciales inválidas" });
-            }
+            return Unauthorized(new { message = "Credenciales inválidas" });
         }
     }
 }

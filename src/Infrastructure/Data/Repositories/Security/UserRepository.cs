@@ -26,7 +26,7 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var user = await GetByIdAsync(id);
             if (user != null)
@@ -36,7 +36,7 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
             }
         }
 
-        public async Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users
                 .Include(u => u.Roles)
@@ -46,11 +46,31 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            return await _context.Users
-                .Include(u => u.Roles)
-                .ThenInclude(r => r.Permissions)
-                .FirstOrDefaultAsync(u => u.Username == username);
+            //var user = await _context.Users.Include(u => u.Roles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Username == username);
+
+
+
+            // Usuario "dummy" para pruebas mientras no hay BD
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = username,
+                PasswordHash = "1234", // Puedes simular un hash simple
+                Email = $"{username}@example.com",
+                Roles = new List<Role>
+            {
+                new Role
+                {
+                    Name = "ADMIN",
+                    Permissions = new List<Permission>()
+                }
+            }
+            };
+
+
+            return user;
         }
+
 
         // Aquí puedes agregar otros métodos que defina IUserRepository
     }

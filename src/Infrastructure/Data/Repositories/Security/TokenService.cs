@@ -1,54 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+
+using InventarioBackend.src.Core.Application.Security.DTOs;
+using InventarioBackend.src.Core.Application.Security.Interfaces;
+using InventarioBackend.src.Core.Domain.Security.Entities;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using InventarioBackend.src.Core.Domain.Security.Entities;
-using InventarioBackend.src.Core.Domain.Security.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
-namespace InventarioBackend.src.Core.Infrastructure.Data.Security
+namespace InventarioBackend.src.Core.Application.Security.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly string _secret;
-        private readonly int _expirationMinutes;
+        private readonly IConfiguration _configuration;
 
         public TokenService(IConfiguration configuration)
         {
-            _secret = configuration["Jwt:Secret"] ?? throw new ArgumentNullException("Jwt:Secret");
-            _expirationMinutes = int.Parse(configuration["Jwt:ExpirationMinutes"] ?? "60");
+            _configuration = configuration;
         }
 
         public TokenResult GenerateToken(User user)
         {
-            var claims = new List<Claim>
+            try
             {
+                var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier.ToString(), user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
 
-            foreach (var role in user.Roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
+            };
+                foreach (var role in user.Roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.Name)); // Asumiendo que Role tiene propiedad Name
+                }
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? throw new Exception("Jwt Secret no configurada")));
+
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var expires = DateTime.Now.AddMinutes(5);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: expires,
+                    signingCredentials: creds
+                );
+                return new TokenResult
+                {
+                    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    Expiration = expires
+                };
             }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var expiration = DateTime.UtcNow.AddMinutes(_expirationMinutes);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: expiration,
-                signingCredentials: creds);
-
-            return new TokenResult
+            catch (Exception ex)
             {
-                TokenString = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = expiration
-            };
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

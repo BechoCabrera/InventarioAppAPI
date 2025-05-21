@@ -7,28 +7,19 @@ using System.Text;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
 using InventarioBackend.src.Core.Application.Security.Services;
 using Microsoft.EntityFrameworkCore;
-using InventarioBackend.src.Core.Infrastructure.Data.Security;
+using InventarioBackend.Core.Application.Menu.Services;
+using InventarioBackend.src.Core.Application.Menu.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Cadena de conexión (ajústala a tu base de datos)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=(localdb)\\mssqllocaldb;Database=InventarioDB;Trusted_Connection=True;";
+var jwtSecret = builder.Configuration["Jwt:Secret"];
+Console.WriteLine($"Jwt:Secret: {jwtSecret ?? "NULL"}");
 
-// Agregar DbContext con SQL Server
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+if (string.IsNullOrEmpty(jwtSecret))
+    throw new Exception("JWT Secret no configurada en appsettings.json");
 
-// Registrar repositorios
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-// Aquí agregar ProductRepository, etc.
-// builder.Services.AddScoped<IProductRepository, ProductRepository>();
+var key = Encoding.ASCII.GetBytes(jwtSecret);
 
-// Registrar servicios de aplicación
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-// builder.Services.AddScoped<IProductService, ProductService>();
-
-// Configurar autenticación JWT (ejemplo básico)
-var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"] ?? "TuClaveSuperSecretaDeAlMenos32Caracteres!");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -36,7 +27,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // En producción poner true
+    options.RequireHttpsMetadata = false; // true en producción
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -48,7 +39,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Agregar controladores y Swagger
+// Controladores y Swagger
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -58,24 +49,25 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Opcional: configurar CORS
+// CORS para Angular
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularClient", builder =>
     {
-        builder.WithOrigins("http://localhost:4200")  // Origen exacto que usas en Angular
+        builder.WithOrigins("http://localhost:4200")
                .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();  // Muy importante para que funcione con credenciales
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
-builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
@@ -84,8 +76,9 @@ app.UseCors("AllowAngularClient");
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles(); // Esto permite servir archivos de wwwroot
-app.UseDeveloperExceptionPage(); // 👈 ¡Agrega esto aquí para ver errores en navegador!
+
+app.UseStaticFiles();
+
 app.MapControllers();
 
 app.Run();

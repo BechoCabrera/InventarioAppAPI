@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace InventarioBackend.src.Host.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/user")]
     public class UserController : ControllerBase
@@ -9,8 +12,10 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpGet]
         public IActionResult GetUser()
         {
-            // Aquí devuelves datos de usuario o lo que necesites
-            return Ok(new { Name = "Demo User", Email = "demo@example.com" });
+            var userName = User.Identity?.Name ?? "Unknown";
+            var email = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "no-email@example.com";
+
+            return Ok(new { Name = userName, Email = email });
         }
     }
 }
