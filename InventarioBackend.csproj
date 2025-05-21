@@ -36,6 +36,8 @@
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\DTOs\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Handlers\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Specs\" />
+    <Folder Include="src\Core\Application\Menu\Interfaces\" />
+    <Folder Include="src\Core\Application\Menu\Services\" />
     <Folder Include="src\Core\Application\Sales\" />
     <Folder Include="src\Core\Application\Products\Category\DTOs\" />
     <Folder Include="src\Core\Application\Products\Category\Handlers\" />

@@ -15,7 +15,7 @@ namespace InventarioBackend.Host.Controllers
             _authenticationService = authenticationService;
         }
 
-        [HttpPost("login")]
+        [HttpPost("api/login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             try
