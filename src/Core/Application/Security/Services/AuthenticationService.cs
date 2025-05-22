@@ -1,16 +1,15 @@
 ﻿using InventarioBackend.src.Core.Application.Security.DTOs;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
 using InventarioBackend.src.Core.Domain.Security.Interfaces;
-using AppTokenService = InventarioBackend.src.Core.Application.Security.Interfaces.ITokenService;
 
 namespace InventarioBackend.src.Core.Application.Security.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUserRepository _userRepository;
-        private readonly AppTokenService _tokenService; 
+        private readonly TokenService _tokenService; 
 
-        public AuthenticationService(IUserRepository userRepository, AppTokenService tokenService)
+        public AuthenticationService(IUserRepository userRepository, TokenService tokenService)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;

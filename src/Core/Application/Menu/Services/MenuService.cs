@@ -2,37 +2,39 @@
 using InventarioBackend.src.Core.Application.Menu.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace InventarioBackend.Core.Application.Menu.Services;
-public class MenuService : IMenuService
+namespace InventarioBackend.Core.Application.Menu.Services
 {
-    private readonly List<MenuDto> _menu;
-
-    public MenuService()
+    public class MenuService : IMenuService
     {
-        _menu = new List<MenuDto>
+        private readonly List<MenuDto> _menu;
+
+        public MenuService()
         {
-            new MenuDto
+            _menu = new List<MenuDto>
             {
-                Route = "dashboard",
-                Name = "dashboard",
-                Type = "link",
-                Icon = "dashboard",
-                Badge = new MenuTagDto { Color = "red-50", Value = "5" }
-            },
-            new MenuDto
-            {
-                Route = "design",
-                Name = "design",
-                Type = "sub",
-                Icon = "color_lens",
-                Label = new MenuTagDto { Color = "azure-50", Value = "New" },
-                Children = new List<MenuChildrenItemDto>
+                new MenuDto
                 {
-                    new MenuChildrenItemDto { Route = "colors", Name = "colors", Type = "link" },
-                    new MenuChildrenItemDto { Route = "icons", Name = "icons", Type = "link" }
-                }
-            },
+                    Route = "dashboard",
+                    Name = "dashboard",
+                    Type = "link",
+                    Icon = "dashboard",
+                    Badge = new MenuTagDto { Color = "red-50", Value = "5" }
+                },
+                new MenuDto
+                {
+                    Route = "design",
+                    Name = "design",
+                    Type = "sub",
+                    Icon = "color_lens",
+                    Label = new MenuTagDto { Color = "azure-50", Value = "New" },
+                    Children = new List<MenuChildrenItemDto>
+                    {
+                        new MenuChildrenItemDto { Route = "colors", Name = "colors", Type = "link" },
+                        new MenuChildrenItemDto { Route = "icons", Name = "icons", Type = "link" }
+                    }
+                },
             new MenuDto
             {
                 Route = "material",
@@ -304,53 +306,79 @@ public class MenuService : IMenuService
 
         };
 
-        // Aplica permiso solo ADMIN a todos los items del menú y sus hijos
-        ApplyAdminPermission(_menu);
-    }
-
-    public List<MenuDto> GetMenuForUser(string[] userRoles)
-    {
-        var filteredMenu = new List<MenuDto>();
-
-        if (userRoles == null) return filteredMenu;
-
-        if (userRoles.Contains("ADMIN"))
-        {
-            // ADMIN ve todo el menú
-            filteredMenu = _menu;
+            // Aplica permiso solo ADMIN a todos los items del menú y sus hijos
+            ApplyAdminPermission(_menu);
         }
 
-        else if (userRoles.Contains("OWNER"))
+
+
+        public async Task<List<MenuDto>> GetMenuForUserAsync(string[] userRoles)
         {
-            // Filtrar menú para OWNER
-            filteredMenu = _menu
-                .Where(item => item.Permissions != null
-                               && item.Permissions.Only != null
-                               && item.Permissions.Only.Contains("OWNER"))
-                .ToList();
+            var filteredMenu = new List<MenuDto>();
+
+            if (userRoles == null || userRoles.Length == 0)
+                return filteredMenu; // Si no hay roles, retornamos vacío.
+
+            if (userRoles.Contains("ADMIN"))
+            {
+                filteredMenu = _menu; // Si es ADMIN, muestra todo el menú.
+            }
+            else if (userRoles.Contains("OWNER"))
+            {
+                filteredMenu = _menu
+                    .Where(item => item.Permissions != null
+                                   && item.Permissions.Only != null
+                                   && item.Permissions.Only.Contains("OWNER"))
+                    .ToList();
+            }
+
+            return await Task.FromResult(filteredMenu); // Retorna el menú filtrado como tarea.
         }
-        return new List<MenuDto>(); // Vacío si no es ADMIN
-    }
-
-    private void ApplyAdminPermission(List<MenuDto> menuItems)
-    {
-        foreach (var item in menuItems)
+        // Método síncrono para obtener el menú según los roles del usuario
+        public List<MenuDto> GetMenuForUser(string[] userRoles)
         {
-            item.Permissions = new MenuPermissionsDto { Only = new[] { "ADMIN" } };
+            var filteredMenu = new List<MenuDto>();
 
-            if (item.Children != null)
-                ApplyAdminPermissionToChildren(item.Children);
+            if (userRoles == null || userRoles.Length == 0)
+                return filteredMenu; // Si no hay roles, retornamos vacío.
+
+            if (userRoles.Contains("ADMIN"))
+            {
+                filteredMenu = _menu; // Si es ADMIN, muestra todo el menú.
+            }
+            else if (userRoles.Contains("OWNER"))
+            {
+                filteredMenu = _menu
+                    .Where(item => item.Permissions != null
+                                   && item.Permissions.Only != null
+                                   && item.Permissions.Only.Contains("OWNER"))
+                    .ToList();
+            }
+
+            return filteredMenu; // Retorna el menú filtrado.
         }
-    }
 
-    private void ApplyAdminPermissionToChildren(List<MenuChildrenItemDto> children)
-    {
-        foreach (var child in children)
+        private void ApplyAdminPermission(List<MenuDto> menuItems)
         {
-            child.Permissions = new MenuPermissionsDto { Only = new[] { "ADMIN" } };
+            foreach (var item in menuItems)
+            {
+                item.Permissions = new MenuPermissionsDto { Only = new[] { "ADMIN" } };
 
-            if (child.Children != null)
-                ApplyAdminPermissionToChildren(child.Children);
+                if (item.Children != null)
+                    ApplyAdminPermissionToChildren(item.Children);
+            }
+        }
+
+        // Recursión para aplicar permisos a los elementos hijos
+        private void ApplyAdminPermissionToChildren(List<MenuChildrenItemDto> children)
+        {
+            foreach (var child in children)
+            {
+                child.Permissions = new MenuPermissionsDto { Only = new[] { "ADMIN" } };
+
+                if (child.Children != null)
+                    ApplyAdminPermissionToChildren(child.Children);
+            }
         }
     }
 }

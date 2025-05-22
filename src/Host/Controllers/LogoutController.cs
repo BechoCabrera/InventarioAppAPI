@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
 
-namespace InventarioBackend.Host.Controllers
+namespace InventarioBackend.src.Host.Controllers
 {
     [ApiController]
     [Route("api/logout")]

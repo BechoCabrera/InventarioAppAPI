@@ -2,7 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 
-namespace InventarioBackend.Host.Controllers
+namespace InventarioBackend.src.Host.Controllers
 {
     [ApiController]
     [Route("api/products")]

@@ -39,7 +39,7 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                var expires = DateTime.Now.AddMinutes(5);
+                var expires = DateTime.Now.AddMinutes(50000);
 
                 var token = new JwtSecurityToken(
                     issuer: _configuration["Jwt:Issuer"],

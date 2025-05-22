@@ -7,6 +7,7 @@ using System;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+
     private readonly IAuthenticationService _authService;
 
     public AuthController(IAuthenticationService authService)
