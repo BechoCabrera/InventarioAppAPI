@@ -1,6 +1,6 @@
 ﻿namespace InventarioBackend.src.Core.Application.Security.DTOs
 {
-    public class ProductDto
+    public class UserDto
     {
         public int Id { get; set; }
         public string Username { get; set; } = null!;

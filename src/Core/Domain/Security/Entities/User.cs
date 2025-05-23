@@ -2,18 +2,25 @@
 {
     public class User
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string Username { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!; // Guarda el hash de la contraseña
-        public List<Role> Roles { get; set; } = new();
+        public string? Avatar { get; set; }
+        public string PasswordHash { get; set; } = null!;
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsActive { get; set; }
 
-        // Método para validar password (compara hash)
+        // Relación muchos a muchos con Roles
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        // Relación muchos a muchos con Permisos
+        public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
         public bool ValidatePassword(string password)
         {
             // Aquí debes implementar la validación de hash real, por ejemplo con BCrypt
             // Ejemplo ficticio (reemplaza con tu lógica real):
-            return PasswordHash == HashPassword(password);
+            return PasswordHash == password;
         }
 
         private string HashPassword(string password)

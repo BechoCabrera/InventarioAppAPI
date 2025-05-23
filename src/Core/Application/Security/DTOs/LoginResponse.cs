@@ -2,7 +2,9 @@
 {
     public class LoginResponse
     {
-        public string AccessToken { get; set; } = null!;
+        public string access_token { get; set; } = null!;
         public DateTime Expiration { get; set; }
+
+        public int expires_in { get; set; }
     }
 }

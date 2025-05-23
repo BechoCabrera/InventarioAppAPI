@@ -1,23 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Repositorios\\InventarioBackend\\InventarioBackend.csproj": {}
+    "C:\\Repositorio\\InventarioAppAPI\\InventarioBackend.csproj": {}
   },
   "projects": {
-    "C:\\Repositorios\\InventarioBackend\\InventarioBackend.csproj": {
+    "C:\\Repositorio\\InventarioAppAPI\\InventarioBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Repositorios\\InventarioBackend\\InventarioBackend.csproj",
+        "projectUniqueName": "C:\\Repositorio\\InventarioAppAPI\\InventarioBackend.csproj",
         "projectName": "InventarioBackend",
-        "projectPath": "C:\\Repositorios\\InventarioBackend\\InventarioBackend.csproj",
-        "packagesPath": "C:\\Users\\becho\\.nuget\\packages\\",
-        "outputPath": "C:\\Repositorios\\InventarioBackend\\obj\\",
+        "projectPath": "C:\\Repositorio\\InventarioAppAPI\\InventarioBackend.csproj",
+        "packagesPath": "C:\\Users\\windows 10\\.nuget\\packages\\",
+        "outputPath": "C:\\Repositorio\\InventarioAppAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages",
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\becho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\windows 10\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 24.2.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +28,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Program Files\\DevExpress 24.2\\Components\\System\\Components\\Packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -45,7 +47,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -59,9 +61,17 @@
               "target": "Package",
               "version": "[9.0.5, )"
             },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.5, )"
+            },
             "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
               "version": "[8.10.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[8.1.1, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
@@ -87,7 +97,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

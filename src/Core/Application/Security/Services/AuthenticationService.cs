@@ -17,16 +17,16 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _userRepository.GetByUsernameAsync(request.Username);
-            if (user == null || !user.ValidatePassword(request.Password))
+            var user = await _userRepository.GetByUsernameAsync(request.Username, request.Password);
+            if (user == null)
                 throw new UnauthorizedAccessException("Credenciales inválidas");
 
             var token = _tokenService.GenerateToken(user);
-
             return new LoginResponse
             {
-                AccessToken = token.Token,
-                Expiration = token.Expiration
+                access_token = token.Token,
+                //expires_in = expnum,
+                Expiration = token.Expiration,
             };
         }
 

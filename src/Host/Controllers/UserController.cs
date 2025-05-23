@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using InventarioBackend.src.Core.Application.Security.DTOs;
+using InventarioBackend.src.Core.Application.Security.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace InventarioBackend.src.Host.Controllers
 {
@@ -9,13 +11,18 @@ namespace InventarioBackend.src.Host.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetUser()
-        {
-            var userName = User.Identity?.Name ?? "Unknown";
-            var email = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "no-email@example.com";
+        private readonly IUserService _userService;
 
-            return Ok(new { Name = userName, Email = email });
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<UserDto>> GetUser()
+        {
+            var user = await _userService.GetCurrentUserAsync(User);
+            return Ok(user);
         }
     }
 }

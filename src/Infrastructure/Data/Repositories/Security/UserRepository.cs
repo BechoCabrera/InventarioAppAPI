@@ -39,39 +39,26 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
         public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users
-                .Include(u => u.Roles)
-                .ThenInclude(r => r.Permissions)
-                .FirstOrDefaultAsync(u => u.Id == id);
+                .Include(u => u.UserRoles)
+                .ThenInclude(r => r.Role)
+                .FirstOrDefaultAsync(u => u.UserId == id);
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetByUsernameAsync(string username, string pass)
         {
-            //var user = await _context.Users.Include(u => u.Roles).ThenInclude(r => r.Permissions).FirstOrDefaultAsync(u => u.Username == username);
-
-
-
-            // Usuario "dummy" para pruebas mientras no hay BD
-            var user = new User
+            User? result = new User();
+            try
             {
-                Id = Guid.NewGuid(),
-                Username = username,
-                PasswordHash = "1234", // Puedes simular un hash simple
-                Email = $"{username}@example.com",
-                Roles = new List<Role>
+                result = await _context.Users
+               .Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ThenInclude(r => r.RolePermissions) // Opcional, si usas permisos más adelante
+               .Include(u => u.UserPermissions).ThenInclude(up => up.Permission)   // Opcional, si accedes a permisos directos
+               .FirstOrDefaultAsync(u => u.Username == username && u.ValidatePassword(u.PasswordHash).ToString() == pass);
+
+            }catch(Exception ex)
             {
-                new Role
-                {
-                    Name = "ADMIN",
-                    Permissions = new List<Permission>()
-                }
+                throw new Exception(ex.Message);
             }
-            };
-
-
-            return user;
+            return result;
         }
-
-
-        // Aquí puedes agregar otros métodos que defina IUserRepository
     }
 }

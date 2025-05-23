@@ -7,7 +7,7 @@ namespace InventarioBackend.src.Core.Domain.Security.Interfaces
     public interface IUserRepository
     {
         Task<User?> GetByIdAsync(Guid id);
-        Task<User?> GetByUsernameAsync(string username);
+        Task<User?> GetByUsernameAsync(string username, string pass);
         Task AddAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(Guid id);

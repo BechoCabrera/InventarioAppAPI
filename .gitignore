@@ -8,6 +8,12 @@
 # Build results
 bin/
 obj/
+[Bb]uild/
+[Ll]og/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
 
 # Rider IDE
 .idea/
@@ -15,6 +21,56 @@ obj/
 # Logs
 *.log
 
-# Packages
+# Package files
 *.nupkg
+*.snupkg
+*.symbols.nupkg
 packages/
+.nuget/
+*.nuspec
+
+# Web output
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/node_modules/
+
+# LibMan
+libman.json
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# Static asset cache (Blazor/WebAssembly)
+**/compressed/
+**/staticwebassets.pack.json
+**/staticwebassets.runtime.json
+**/staticwebassets.development.json
+**/staticwebassets.build.json
+**/staticwebassets.upToDateCheck.txt
+
+# Coverage results
+*.coverage
+*.coveragexml
+TestResults/
+
+# Configuration
+appsettings.*.json
+!appsettings.json  # incluye solo el base si deseas
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.tmp
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper

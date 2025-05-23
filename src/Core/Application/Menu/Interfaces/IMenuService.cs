@@ -4,7 +4,7 @@ namespace InventarioBackend.src.Core.Application.Menu.Interfaces
 {
     public interface IMenuService
     {
-        Task<List<MenuDto>> GetMenuForUserAsync(string[] userRoles);
+        Task<List<MenuDto>> GetMenuForUserAsync(Guid userRoles);
         List<MenuDto> GetMenuForUser(string[] userRoles);
     }
 

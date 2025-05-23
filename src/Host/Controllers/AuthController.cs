@@ -1,31 +1,31 @@
 ﻿using InventarioBackend.src.Core.Application.Security.DTOs;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+    private readonly IAuthenticationService _authenticationService;
 
-    private readonly IAuthenticationService _authService;
-
-    public AuthController(IAuthenticationService authService)
+    public AuthController(IAuthenticationService authenticationService)
     {
-        _authService = authService;
+        _authenticationService = authenticationService;
     }
 
+    [AllowAnonymous] // 🔥 Esto permite que cualquier usuario acceda
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
         try
         {
-            var tokenResponse = await _authService.LoginAsync(request);
-            return Ok(tokenResponse);
+            var response = await _authenticationService.LoginAsync(request);
+            return Ok(response);
         }
         catch (UnauthorizedAccessException)
         {
-            return Unauthorized(new { message = "Credenciales inválidas" });
+            return Unauthorized(new { message = "Usuario o contraseña incorrectos." });
         }
     }
 }
