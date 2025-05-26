@@ -77,7 +77,11 @@
         "permissions": "Permisos",
         "permissions.role-switching": "Cambio de Rol",
         "permissions.route-guard": "Guardia de Ruta",
-        "permissions.test": "Prueba de Permiso"
+        "permissions.test": "Prueba de Permiso",
+        "productos": "Productos",
+        "productos.categorias": "Categorías",
+        "productos.crear-producto": "Crear Producto"
+
     },
     "validation": {
         "required": "Este campo es obligatorio",

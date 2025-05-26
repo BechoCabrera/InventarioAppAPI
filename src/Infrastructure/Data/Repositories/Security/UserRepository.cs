@@ -46,19 +46,23 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
 
         public async Task<User?> GetByUsernameAsync(string username, string pass)
         {
-            User? result = new User();
             try
             {
-                result = await _context.Users
-               .Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ThenInclude(r => r.RolePermissions) // Opcional, si usas permisos más adelante
-               .Include(u => u.UserPermissions).ThenInclude(up => up.Permission)   // Opcional, si accedes a permisos directos
-               .FirstOrDefaultAsync(u => u.Username == username && u.ValidatePassword(u.PasswordHash).ToString() == pass);
+                var user = await _context.Users
+                    .Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ThenInclude(r => r.RolePermissions)
+                    .Include(u => u.UserPermissions).ThenInclude(up => up.Permission)
+                    .FirstOrDefaultAsync(u => u.Username == username);
 
-            }catch(Exception ex)
-            {
-                throw new Exception(ex.Message);
+                if (user == null || !user.ValidatePassword(pass))
+                    return null;
+
+                return user;
             }
-            return result;
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar usuario: " + ex.Message);
+            }
         }
+
     }
 }

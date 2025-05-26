@@ -11,6 +11,7 @@ public class MenuItem
     public string? BadgeValue { get; set; }
     public string? LabelColor { get; set; }
     public string? LabelValue { get; set; }
+    public bool IsActive { get; set; }
 
     public Guid? ParentId { get; set; }
     public MenuItem? Parent { get; set; }

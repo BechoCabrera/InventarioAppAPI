@@ -1,7 +1,9 @@
-﻿using InventarioBackend.src.Core.Application.Menu.DTOs;
+﻿
+using InventarioBackend.src.Core.Application.Menu.DTOs;
 using InventarioBackend.src.Core.Application.Menu.Interfaces;
 using InventarioBackend.src.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +12,11 @@ namespace InventarioBackend.Core.Application.Menu.Services
 {
     public class MenuService : IMenuService
     {
-        //    public MenuService()
-        //    {
-        //        _menu = new List<MenuDto>
+        private readonly AppDbContext _context;
+
+        //public MenuService()
+        //{
+        //    _menu = new List<MenuDto>
         //        {
         //            new MenuDto
         //            {
@@ -306,82 +310,67 @@ namespace InventarioBackend.Core.Application.Menu.Services
 
         //    };
 
-        //        // Aplica permiso solo ADMIN a todos los items del menú y sus hijos
-        //        ApplyAdminPermission(_menu);
-        //    }
-
-
-        private readonly AppDbContext _context;
+        //    // Aplica permiso solo ADMIN a todos los items del menú y sus hijos
+        //    ApplyAdminPermission(_menu);
+        //}
 
         public MenuService(AppDbContext context)
         {
             _context = context;
         }
-        public List<MenuDto> GetMenuForUser(string[] userRoles)
-        {
-            var filteredMenu = new List<MenuDto>();
-
-            if (userRoles == null || userRoles.Length == 0)
-                return filteredMenu;
-
-            var isAdmin = userRoles.Contains("ADMIN");
-
-            var menuItems = _context.MenuItems
-                .Include(m => m.Children)
-                .Include(m => m.MenuItemPermissions)
-                    .ThenInclude(mp => mp.Permission)
-                .ToList();
-
-            if (!isAdmin)
-            {
-                // Si no es admin, filtra por permisos
-                menuItems = menuItems
-                    .Where(m => m.MenuItemPermissions.Any(mp =>
-                        userRoles.Contains(mp.Permission.PermissionName)))
-                    .ToList();
-            }
-
-            var menuTree = menuItems
-                .Where(m => m.ParentId == null)
-                .Select(m => MapToDtoRecursive(m, menuItems))
-                .ToList();
-
-            return menuTree;
-        }
 
         public async Task<List<MenuDto>> GetMenuForUserAsync(Guid userId)
         {
-            var user = await _context.Users
-                .Include(u => u.UserPermissions).ThenInclude(up => up.Permission)
-                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ThenInclude(r => r.RolePermissions).ThenInclude(rp => rp.Permission)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null) return new List<MenuDto>();
-
-            var isAdmin = user.UserRoles.Any(r => r.Role.RoleName == "ADMIN");
-
-            var permissions = user.UserPermissions.Select(up => up.Permission.PermissionName)
-                .Union(user.UserRoles.SelectMany(ur => ur.Role.RolePermissions.Select(rp => rp.Permission.PermissionName)))
-                .Distinct().ToList();
-
-            IQueryable<MenuItem> query = _context.MenuItems
-                .Include(m => m.Children)
-                .Include(m => m.MenuItemPermissions)
-                    .ThenInclude(mp => mp.Permission);
-
-            if (!isAdmin)
+            try
             {
-                query = query.Where(m => m.MenuItemPermissions.Any(mp => permissions.Contains(mp.Permission.PermissionName)));
+                var user = await _context.Users
+               .Include(u => u.UserPermissions).ThenInclude(up => up.Permission)
+               .Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ThenInclude(r => r.RolePermissions).ThenInclude(rp => rp.Permission)
+               .FirstOrDefaultAsync(u => u.UserId == userId);
+
+                if (user == null)
+                    return new List<MenuDto>();
+
+                var isAdmin = user.UserRoles.Any(r => r.Role.RoleName == "ADMIN");
+
+                var permissions = user.UserPermissions
+                    .Select(up => up.Permission.PermissionName)
+                    .Union(user.UserRoles.SelectMany(ur => ur.Role.RolePermissions.Select(rp => rp.Permission.PermissionName)))
+                    .Distinct()
+                    .ToList();
+
+                IQueryable<MenuItem> query = _context.MenuItems
+          .Include(m => m.Children)
+          .Include(m => m.MenuItemPermissions)
+              .ThenInclude(mp => mp.Permission)
+          .Where(m => m.IsActive);
+
+                var corruptos = query.SelectMany(m => m.MenuItemPermissions)
+    .Where(mp => mp.Permission == null)
+    .ToList();
+
+                Console.WriteLine($"PERMISOS NULOS: {corruptos.Count}");
+
+                if (!isAdmin)
+                {
+                    query = query.Where(m =>
+                        m.MenuItemPermissions.Any(mp => mp.Permission != null && permissions.Contains(mp.Permission.PermissionName)));
+                }
+                Console.WriteLine("Permisos: " + string.Join(", ", permissions));
+                List<MenuItem> menuItems = await query.ToListAsync();
+
+                var menuTree = menuItems
+                    .Where(m => m.ParentId == null)
+                    .Select(m => MapToDtoRecursive(m, menuItems))
+                    .ToList();
+
+                return menuTree;
+
             }
-
-            var menuItems = await query.ToListAsync();
-
-            var menuTree = menuItems
-                .Where(m => m.ParentId == null)
-                .Select(m => MapToDtoRecursive(m, menuItems))
-                .ToList();
-
-            return menuTree;
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         private MenuDto MapToDtoRecursive(MenuItem item, List<MenuItem> allItems)
@@ -392,11 +381,22 @@ namespace InventarioBackend.Core.Application.Menu.Services
                 Route = item.Route,
                 Icon = item.Icon,
                 Type = item.Type,
-                Badge = string.IsNullOrEmpty(item.BadgeValue) ? null : new MenuTagDto { Color = item.BadgeColor, Value = item.BadgeValue },
-                Label = string.IsNullOrEmpty(item.LabelValue) ? null : new MenuTagDto { Color = item.LabelColor, Value = item.LabelValue },
+                Badge = string.IsNullOrEmpty(item.BadgeValue) ? null : new MenuTagDto
+                {
+                    Color = item.BadgeColor ?? string.Empty,
+                    Value = item.BadgeValue
+                },
+                Label = string.IsNullOrEmpty(item.LabelValue) ? null : new MenuTagDto
+                {
+                    Color = item.LabelColor ?? string.Empty,
+                    Value = item.LabelValue
+                },
                 Permissions = new MenuPermissionsDto
                 {
-                    Only = item.MenuItemPermissions.Select(mp => mp.Permission.PermissionName).ToArray()
+                    Only = item.MenuItemPermissions
+                        .Where(mp => mp.Permission != null && !string.IsNullOrEmpty(mp.Permission.PermissionName))
+                        .Select(mp => mp.Permission.PermissionName)
+                        .ToArray()
                 },
                 Children = allItems
                     .Where(child => child.ParentId == item.MenuItemId)
@@ -405,18 +405,20 @@ namespace InventarioBackend.Core.Application.Menu.Services
             };
         }
 
+
         private MenuChildrenItemDto MapToChildDtoRecursive(MenuItem item, List<MenuItem> allItems)
         {
             return new MenuChildrenItemDto
             {
-                Name = item.Name,
-                Route = item.Route,
-                Type = item.Type,
+                Name = item.Name ?? string.Empty,
+                Route = item.Route ?? string.Empty,
+                Type = item.Type ?? string.Empty,
                 Children = allItems
-                    .Where(child => child.ParentId == item.MenuItemId)
+                    .Where(child => child.ParentId != null && child.ParentId == item.MenuItemId)
                     .Select(child => MapToChildDtoRecursive(child, allItems))
                     .ToList()
             };
         }
+
     }
 }

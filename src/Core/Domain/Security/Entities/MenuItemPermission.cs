@@ -3,9 +3,9 @@
     public class MenuItemPermission
     {
         public Guid MenuItemId { get; set; }
-        public MenuItem MenuItem { get; set; } = null!;
-
         public Guid PermissionId { get; set; }
-        public Permission Permission { get; set; } = null!;
+
+        public MenuItem MenuItem { get; set; }
+        public Permission Permission { get; set; }
     }
 }

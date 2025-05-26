@@ -78,18 +78,19 @@ namespace InventarioBackend.src.Infrastructure.Data
                  .OnDelete(DeleteBehavior.Restrict);
 
             // Relación muchos a muchos MenuItem <-> Permission
-            modelBuilder.Entity<MenuItemPermission>()
-                .HasKey(mp => new { mp.MenuItemId, mp.PermissionId });
+            modelBuilder.Entity<MenuItemPermission>(entity =>
+            {
+                entity.HasKey(e => new { e.MenuItemId, e.PermissionId });
 
-            modelBuilder.Entity<MenuItemPermission>()
-                .HasOne(mp => mp.MenuItem)
-                .WithMany(m => m.MenuItemPermissions)
-                .HasForeignKey(mp => mp.MenuItemId);
+                entity.HasOne(e => e.MenuItem)
+                    .WithMany(m => m.MenuItemPermissions)
+                    .HasForeignKey(e => e.MenuItemId);
 
-            modelBuilder.Entity<MenuItemPermission>()
-                .HasOne(mp => mp.Permission)
-                .WithMany()
-                .HasForeignKey(mp => mp.PermissionId);
+                entity.HasOne(e => e.Permission)
+                    .WithMany(p => p.MenuItemPermissions)
+                    .HasForeignKey(e => e.PermissionId);
+            });
+
 
             // Aquí puedes agregar configuraciones adicionales de entidades, índices, etc.
         }
