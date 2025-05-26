@@ -340,30 +340,31 @@ namespace InventarioBackend.Core.Application.Menu.Services
                     .ToList();
 
                 IQueryable<MenuItem> query = _context.MenuItems
-          .Include(m => m.Children)
-          .Include(m => m.MenuItemPermissions)
-              .ThenInclude(mp => mp.Permission)
-          .Where(m => m.IsActive);
+                     .Include(m => m.Children)
+                     .Include(m => m.MenuItemPermissions)
+                     .ThenInclude(mp => mp.Permission)
+                 .Where(m => m.IsActive);
 
                 var corruptos = query.SelectMany(m => m.MenuItemPermissions)
-    .Where(mp => mp.Permission == null)
-    .ToList();
+                    .Where(mp => mp.Permission == null)
+                    .ToList();
 
-                Console.WriteLine($"PERMISOS NULOS: {corruptos.Count}");
+               
 
                 if (!isAdmin)
                 {
                     query = query.Where(m =>
                         m.MenuItemPermissions.Any(mp => mp.Permission != null && permissions.Contains(mp.Permission.PermissionName)));
                 }
-                Console.WriteLine("Permisos: " + string.Join(", ", permissions));
+             
                 List<MenuItem> menuItems = await query.ToListAsync();
 
-                var menuTree = menuItems
-                    .Where(m => m.ParentId == null)
-                    .Select(m => MapToDtoRecursive(m, menuItems))
-                    .ToList();
+                var rootMenus = menuItems.Where(m => m.ParentId == null || !menuItems.Any(x => x.MenuItemId == m.ParentId)).ToList();
 
+                var menuTree = rootMenus.Select(m => MapToDtoRecursive(m, menuItems)).ToList();
+                Console.WriteLine("Permisos del usuario propietario:");
+                foreach (var p in permissions)
+                    Console.WriteLine($" - {p}");
                 return menuTree;
 
             }
@@ -413,12 +414,19 @@ namespace InventarioBackend.Core.Application.Menu.Services
                 Name = item.Name ?? string.Empty,
                 Route = item.Route ?? string.Empty,
                 Type = item.Type ?? string.Empty,
+                Permissions = new MenuPermissionsDto
+                {
+                    Only = item.MenuItemPermissions?
+                        .Where(mp => mp.Permission != null && !string.IsNullOrWhiteSpace(mp.Permission.PermissionName))
+                        .Select(mp => mp.Permission.PermissionName.Trim())
+                        .ToArray(),
+                    Except = null
+                },
                 Children = allItems
                     .Where(child => child.ParentId != null && child.ParentId == item.MenuItemId)
                     .Select(child => MapToChildDtoRecursive(child, allItems))
                     .ToList()
             };
         }
-
     }
 }

@@ -7,5 +7,6 @@
 
         public MenuItem MenuItem { get; set; }
         public Permission Permission { get; set; }
+
     }
 }

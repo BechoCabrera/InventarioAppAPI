@@ -1,27 +1,29 @@
-# Visual Studio
+﻿#################################
+# 🔧 Visual Studio / Rider
+#################################
 .vs/
-*.user
+.vs/**/*
+.idea/
 *.suo
+*.user
 *.userosscache
 *.sln.docstates
 
-# Build results
-bin/
-obj/
-[Bb]uild/
-[Ll]og/
+#################################
+# 🏗 Build artifacts
+#################################
+[Bb]in/
+[Oo]bj/
 [Dd]ebug/
 [Rr]elease/
 x64/
 x86/
+build/
+BuildArtifacts/
 
-# Rider IDE
-.idea/
-
-# Logs
-*.log
-
-# Package files
+#################################
+# 📦 NuGet / paquetes
+#################################
 *.nupkg
 *.snupkg
 *.symbols.nupkg
@@ -29,48 +31,54 @@ packages/
 .nuget/
 *.nuspec
 
-# Web output
-wwwroot/lib/
-wwwroot/dist/
-wwwroot/node_modules/
-
-# LibMan
-libman.json
-
-# Node
-node_modules/
-npm-debug.log*
-yarn-error.log
-
-# Static asset cache (Blazor/WebAssembly)
-**/compressed/
-**/staticwebassets.pack.json
-**/staticwebassets.runtime.json
-**/staticwebassets.development.json
-**/staticwebassets.build.json
-**/staticwebassets.upToDateCheck.txt
-
-# Coverage results
+#################################
+# 🧪 Test / Cobertura
+#################################
 *.coverage
 *.coveragexml
 TestResults/
 
-# Configuration
+#################################
+# 💾 Configuración local
+#################################
 appsettings.*.json
-!appsettings.json  # incluye solo el base si deseas
+!appsettings.json
 
-# JetBrains Rider
-.idea/
-*.sln.iml
+#################################
+# 🌐 Web output (Blazor, Angular)
+#################################
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/node_modules/
+node_modules/
+libman.json
 
-# OS generated files
-.DS_Store
-Thumbs.db
+#################################
+# ⚙️ Archivos generados por Blazor WASM
+#################################
+**/compressed/
+**/staticwebassets.build.json
+**/staticwebassets.runtime.json
+**/staticwebassets.development.json
+**/staticwebassets.pack.json
+**/staticwebassets.upToDateCheck.txt
 
-# Backup files
+#################################
+# 📑 Logs y backups
+#################################
+*.log
 *.bak
 *.tmp
 
-# ReSharper
+#################################
+# 🧪 ReSharper / Rider
+#################################
 _ReSharper*/
 *.[Rr]e[Ss]harper
+*.sln.iml
+
+#################################
+# 💻 Archivos del sistema
+#################################
+.DS_Store
+Thumbs.db
