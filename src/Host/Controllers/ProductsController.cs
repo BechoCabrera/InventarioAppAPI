@@ -1,69 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using InventarioBackend.src.Core.Application.Products.DTOs;
+﻿using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioBackend.src.Host.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("api/products")]
-    public class ProductController : ControllerBase
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
 
-        public ProductController(IProductService productService)
+        public ProductsController(IProductService productService)
         {
             _productService = productService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<List<ProductDto>>> GetAll()
         {
-            var products = await _productService.GetAllAsync();
-            return Ok(products);
+            var result = await _productService.GetAllAsync();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<ProductDto>> GetById(Guid id)
         {
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null)
-                return NotFound();
-
-            return Ok(product);
+            var result = await _productService.GetByIdAsync(id);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProductDto productDto)
+        public async Task<ActionResult> Create([FromBody] ProductCreateDto dto)
         {
-            await _productService.AddAsync(productDto);
-            return CreatedAtAction(nameof(GetById), new { id = productDto.Id }, productDto);
+            var id = await _productService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ProductDto productDto)
-        {
-            if (id != productDto.Id)
-                return BadRequest();
-
-            var exists = await _productService.ExistsAsync(id);
-            if (!exists)
-                return NotFound();
-
-            await _productService.UpdateAsync(productDto);
-            return NoContent();
-        }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateDto dto)
+        //{
+        //    var success = await _productService.UpdateAsync(id, dto);
+        //    return success ? NoContent() : NotFound();
+        //}
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var exists = await _productService.ExistsAsync(id);
-            if (!exists)
-                return NotFound();
-
-            await _productService.DeleteAsync(id);
-            return NoContent();
+            var success = await _productService.DeleteAsync(id);
+            return success ? NoContent() : NotFound();
         }
     }
 }

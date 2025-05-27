@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using InventarioBackend.Core.Application.Menu.Services;
 using InventarioBackend.src.Core.Application.Menu.Interfaces;
 using System.Security.Claims;
+using InventarioBackend.src.Core.Application._Common.Mappings;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args); // ← Permite detectar entorno correctamente
 
@@ -57,6 +59,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sqlOptions => sqlOptions.EnableRetryOnFailure()
     )
 );
+
+TypeAdapterConfig.GlobalSettings.Scan(typeof(ProductMapping).Assembly);
 
 // Configuración de controladores y JSON
 builder.Services.AddControllers()

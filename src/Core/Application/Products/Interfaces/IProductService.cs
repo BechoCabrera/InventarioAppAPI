@@ -6,11 +6,11 @@ namespace InventarioBackend.src.Core.Application.Products.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductDto>> GetAllAsync();
-        Task<ProductDto?> GetByIdAsync(int id);
-        Task AddAsync(ProductDto productDto);
-        Task UpdateAsync(ProductDto productDto);
-        Task DeleteAsync(int id);
-        Task<bool> ExistsAsync(int id);
+        Task<List<ProductDto>> GetAllAsync();
+        Task<ProductDto?> GetByIdAsync(Guid id);
+        Task<Guid> CreateAsync(ProductCreateDto dto);
+        //Task<ProductDto?> UpdateAsync(Guid id, ProductDto dto);
+        Task<bool> DeleteAsync(Guid id);
     }
+
 }

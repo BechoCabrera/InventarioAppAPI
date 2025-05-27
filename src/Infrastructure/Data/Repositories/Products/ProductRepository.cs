@@ -15,7 +15,7 @@ public class ProductRepository : IProductRepository
         _dbSet = context.Set<Product>();
     }
 
-    public async Task<Product?> GetByIdAsync(int id)
+    public async Task<Product?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
     }
@@ -37,12 +37,12 @@ public class ProductRepository : IProductRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
-        var product = await GetByIdAsync(id);
+        var product = await _context.Products.FindAsync(id);
         if (product != null)
         {
-            _dbSet.Remove(product);
+            _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
     }

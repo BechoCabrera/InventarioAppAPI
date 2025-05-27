@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.10.0" />
@@ -37,15 +38,6 @@
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Handlers\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Specs\" />
     <Folder Include="src\Core\Application\Sales\" />
-    <Folder Include="src\Core\Application\Products\Category\DTOs\" />
-    <Folder Include="src\Core\Application\Products\Category\Handlers\" />
-    <Folder Include="src\Core\Application\Products\Category\Specs\" />
-    <Folder Include="src\Core\Application\Products\Product\DTOs\" />
-    <Folder Include="src\Core\Application\Products\Product\Handlers\" />
-    <Folder Include="src\Core\Application\Products\Product\Specs\" />
-    <Folder Include="src\Core\Application\Products\Supplier\DTOs\" />
-    <Folder Include="src\Core\Application\Products\Supplier\Handlers\" />
-    <Folder Include="src\Core\Application\Products\Supplier\Specs\" />
     <Folder Include="src\Core\Domain\Inventory\Entities\" />
     <Folder Include="src\Core\Domain\Inventory\Interfaces\" />
     <Folder Include="src\Core\Domain\Inventory\Services\" />

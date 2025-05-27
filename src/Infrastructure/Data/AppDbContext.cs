@@ -1,4 +1,5 @@
-﻿using InventarioBackend.src.Core.Domain.Products;
+﻿using InventarioBackend.Infrastructure.Data.EntityConfigurations;
+using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -91,6 +92,7 @@ namespace InventarioBackend.src.Infrastructure.Data
                     .HasForeignKey(e => e.PermissionId);
             });
 
+            modelBuilder.ApplyConfiguration(new ProductConfig());
 
             // Aquí puedes agregar configuraciones adicionales de entidades, índices, etc.
         }

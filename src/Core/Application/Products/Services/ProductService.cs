@@ -2,6 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
+using Mapster;
 
 namespace InventarioBackend.src.Core.Application.Products.Services
 {
@@ -12,65 +13,46 @@ namespace InventarioBackend.src.Core.Application.Products.Services
         public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
-        }
+        }  
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync()
+        public async Task<List<ProductDto>> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
-            return products.Select(p => MapToDto(p));
+            return products.Adapt<List<ProductDto>>();
         }
 
-        public async Task<ProductDto?> GetByIdAsync(int id)
+        public async Task<ProductDto?> GetByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return product == null ? null : MapToDto(product);
+            return product?.Adapt<ProductDto>();
         }
 
-        public async Task AddAsync(ProductDto productDto)
+        public async Task<Guid> CreateAsync(ProductCreateDto dto)
         {
-            var product = MapToEntity(productDto);
+            var product = dto.Adapt<Product>();
             await _productRepository.AddAsync(product);
+            return product.ProductId;
         }
 
-        public async Task UpdateAsync(ProductDto productDto)
-        {
-            var product = MapToEntity(productDto);
-            await _productRepository.UpdateAsync(product);
-        }
+        //public async Task<bool> UpdateAsync(Guid id, ProductDto dto)
+        //{
+        //    var existing = await _productRepository.GetByIdAsync(id);
+        //    if (existing == null) return false;
 
-        public async Task DeleteAsync(int id)
-        {
-            await _productRepository.DeleteAsync(id);
-        }
+        //    dto.Adapt(existing);
+        //    existing.UpdatedAt = DateTime.UtcNow;
 
-        public async Task<bool> ExistsAsync(int id)
+        //    await _productRepository.UpdateAsync(existing);
+        //    return true;
+        //}
+
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return product != null;
-        }
+            if (product == null) return false;
 
-        private static ProductDto MapToDto(Product product)
-        {
-            return new ProductDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock
-            };
-        }
-
-        private static Product MapToEntity(ProductDto dto)
-        {
-            return new Product
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                Stock = dto.Stock
-            };
+            await _productRepository.DeleteAsync(id);
+            return true;
         }
     }
 }
