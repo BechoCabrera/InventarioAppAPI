@@ -12,6 +12,10 @@ using InventarioBackend.src.Core.Application.Menu.Interfaces;
 using System.Security.Claims;
 using InventarioBackend.src.Core.Application._Common.Mappings;
 using Mapster;
+using InventarioBackend.src.Core.Application.Products.Interfaces;
+using InventarioBackend.src.Core.Application.Products.Services;
+using InventarioBackend.src.Core.Domain.Products.Interfaces;
+using InventarioBackend.src.Infrastructure.Data.Repositories.Products;
 
 var builder = WebApplication.CreateBuilder(args); // ← Permite detectar entorno correctamente
 
@@ -45,13 +49,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
 // Inyección de dependencias
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
-
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddHttpContextAccessor();
 // Configuración de DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
@@ -60,6 +68,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+//Mapping
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ProductMapping).Assembly);
 
 // Configuración de controladores y JSON

@@ -1,4 +1,6 @@
-﻿namespace InventarioBackend.src.Core.Application.Products.DTOs
+﻿using InventarioBackend.src.Core.Domain.Security.Entities;
+
+namespace InventarioBackend.src.Core.Application.Products.DTOs
 {
     public class ProductDto
     {
@@ -8,5 +10,9 @@
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public string? Category { get; set; }
+        public Boolean IsActive { get; set; }
+        public Guid RegUserId { get; set; }
+        public string BarCode { get; set; } = default!;  
+        public string? Username { get; set; }
     }
 }

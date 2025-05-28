@@ -30,18 +30,18 @@ namespace InventarioBackend.src.Host.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] ProductCreateDto dto)
+        public async Task<ActionResult> Create(ProductCreateDto dto)
         {
             var id = await _productService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateDto dto)
-        //{
-        //    var success = await _productService.UpdateAsync(id, dto);
-        //    return success ? NoContent() : NotFound();
-        //}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, bool isActive)
+        {
+            var success = await _productService.UpdateStatusAsync(id, isActive);
+            return success ? NoContent() : NotFound();
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)

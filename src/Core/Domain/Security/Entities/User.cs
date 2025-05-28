@@ -1,4 +1,6 @@
-﻿namespace InventarioBackend.src.Core.Domain.Security.Entities
+﻿using InventarioBackend.src.Core.Domain.Products;
+
+namespace InventarioBackend.src.Core.Domain.Security.Entities
 {
     public class User
     {
@@ -12,6 +14,7 @@
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; }
 
+        public ICollection<Product> Products { get; set; } = new List<Product>();
         // Relación muchos a muchos con Roles
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
         // Relación muchos a muchos con Permisos
