@@ -16,6 +16,12 @@ using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Application.Products.Services;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
 using InventarioBackend.src.Infrastructure.Data.Repositories.Products;
+using Infrastructure.Data.Repositories.Products;
+using InventarioBackend.Infrastructure.Data.Repositories.Clients;
+using InventarioBackend.src.Core.Application.Clients.Interfaces;
+using InventarioBackend.src.Core.Domain.Clients.Interfaces;
+using InventarioBackend.Core.Application.Clients.Services;
+
 
 var builder = WebApplication.CreateBuilder(args); // ← Permite detectar entorno correctamente
 
@@ -67,6 +73,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sqlOptions => sqlOptions.EnableRetryOnFailure()
     )
 );
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 //Mapping
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ProductMapping).Assembly);

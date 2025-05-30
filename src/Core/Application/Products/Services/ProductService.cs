@@ -2,9 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
-using InventarioBackend.src.Core.Domain.Security.Entities;
 using Mapster;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 

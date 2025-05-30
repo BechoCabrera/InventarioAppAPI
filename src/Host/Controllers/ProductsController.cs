@@ -1,11 +1,13 @@
 ﻿using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioBackend.src.Host.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;

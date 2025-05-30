@@ -1,4 +1,5 @@
-﻿using InventarioBackend.src.Core.Domain.Security.Entities;
+﻿using InventarioBackend.src.Core.Domain.Products.Entities;
+using InventarioBackend.src.Core.Domain.Security.Entities;
 
 namespace InventarioBackend.src.Core.Domain.Products
 {
@@ -16,5 +17,6 @@ namespace InventarioBackend.src.Core.Domain.Products
         public string? BarCode { get; set; }
         public Guid RegUserId { get; set; }
         public User User { get; set; }
+        public Category? Category { get; set; }
     }
 }

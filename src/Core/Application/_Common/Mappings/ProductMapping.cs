@@ -1,4 +1,6 @@
-﻿using InventarioBackend.src.Core.Application.Products.DTOs;
+﻿using InventarioBackend.src.Core.Application.Clients.DTOs;
+using InventarioBackend.src.Core.Application.Products.DTOs;
+using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using Mapster;
 
@@ -10,11 +12,17 @@ namespace InventarioBackend.src.Core.Application._Common.Mappings
         {
             // Mapeo de entidad a DTO incluyendo el nombre del usuario
             config.NewConfig<Product, ProductDto>()
-              .Map(dest => dest.Username, src => src.User.Name);
+              .Map(dest => dest.Username, src => src.User.Name)
+              .Map(dest => dest.CategoryName, src => src.Category!.Name)
+              ;
 
             config.NewConfig<ProductCreateDto, Product>();
             config.NewConfig<ProductUpdateDto, Product>()
                   .Ignore(dest => dest.CreatedAt); // No tocar esta propiedad al actualizar
+
+            config.NewConfig<Client, ClientDto>();
+            config.NewConfig<ClientCreateDto, Client>();
+            config.NewConfig<ClientUpdateDto, Client>();
         }
     }
 }

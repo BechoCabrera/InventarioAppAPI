@@ -14,5 +14,6 @@ namespace InventarioBackend.src.Core.Application.Products.DTOs
         public Guid RegUserId { get; set; }
         public string BarCode { get; set; } = default!;  
         public string? Username { get; set; }
+        public string? CategoryName { get; set; }
     }
 }

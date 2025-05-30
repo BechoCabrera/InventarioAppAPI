@@ -22,7 +22,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        return await _dbSet.Include(p => p.User).ToListAsync();
+        return await _dbSet.Include(p => p.User).Include(a=>a.Category).ToListAsync();
     }
 
     public async Task AddAsync(Product product)

@@ -1,5 +1,6 @@
 ﻿using InventarioBackend.Infrastructure.Data.EntityConfigurations;
 using InventarioBackend.src.Core.Domain.Products;
+using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,11 +9,6 @@ namespace InventarioBackend.src.Infrastructure.Data
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        // Productos
-        public DbSet<Product> Products { get; set; } = null!;
-
-        // Seguridad
         public DbSet<User> Users => Set<User>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Permission> Permissions => Set<Permission>();
@@ -22,7 +18,8 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<UserRole> UserRoles => Set<UserRole>();
         public DbSet<MenuItem> MenuItems => Set<MenuItem>();
         public DbSet<MenuItemPermission> MenuItemPermissions => Set<MenuItemPermission>();
-
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission
@@ -76,6 +73,11 @@ namespace InventarioBackend.src.Infrastructure.Data
               .HasOne(up => up.User)
               .WithMany(u => u.Products)
               .HasForeignKey(up => up.RegUserId);
+
+            modelBuilder.Entity<Product>()
+          .HasOne(up => up.Category)
+          .WithMany(u => u.Products)
+          .HasForeignKey(up => up.CategoryId);
 
             // MenuItem relación jerárquica
             modelBuilder.Entity<MenuItem>()

@@ -32,8 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Core\Application\Clients\DTOs\" />
-    <Folder Include="src\Core\Application\Clients\Interfaces\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\DTOs\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Handlers\" />
     <Folder Include="src\Core\Application\Inventory\InventoryMovement\Specs\" />

@@ -1,0 +1,13 @@
+﻿using InventarioBackend.src.Core.Application.Clients.DTOs;
+
+namespace InventarioBackend.src.Core.Application.Clients.Interfaces
+{
+    public interface IClientService
+    {
+        Task<List<ClientDto>> GetAllAsync();
+        Task<ClientDto?> GetByIdAsync(Guid id);
+        Task AddAsync(ClientCreateDto dto);
+        Task UpdateAsync(Guid id, ClientUpdateDto dto);
+        Task DeleteAsync(Guid id);
+    }
+}
