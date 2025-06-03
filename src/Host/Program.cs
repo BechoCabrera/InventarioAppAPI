@@ -21,6 +21,14 @@ using InventarioBackend.Infrastructure.Data.Repositories.Clients;
 using InventarioBackend.src.Core.Application.Clients.Interfaces;
 using InventarioBackend.src.Core.Domain.Clients.Interfaces;
 using InventarioBackend.Core.Application.Clients.Services;
+using InventarioBackend.Core.Application._Common.Mappings;
+using InventarioBackend.Core.Application.Billing.Services;
+using InventarioBackend.Core.Domain.Billing.Interfaces;
+using InventarioBackend.Infrastructure.Data.Repositories.Billing;
+using InventarioBackend.src.Core.Application.Billing.Interfaces;
+using InventarioBackend.src.Core.Application.Settings.Services;
+using InventarioBackend.src.Core.Domain.Settings.Interfaces;
+using InventarioBackend.src.Infrastructure.Data.Repositories.Settings;
 
 
 var builder = WebApplication.CreateBuilder(args); // ← Permite detectar entorno correctamente
@@ -77,9 +85,16 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IClientService, ClientService>();
-
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IInvoiceDetailRepository, InvoiceDetailRepository>(); // opcional
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IConsecutiveSettingsRepository, ConsecutiveSettingsRepository>();
+builder.Services.AddScoped<ConsecutiveSettingsService>();
 //Mapping
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ProductMapping).Assembly);
+TypeAdapterConfig.GlobalSettings.Scan(typeof(ClientMapping).Assembly);
+TypeAdapterConfig.GlobalSettings.Scan(typeof(InvoiceMapping).Assembly);
+TypeAdapterConfig.GlobalSettings.Scan(typeof(ConsecutiveSettingsMapping).Assembly);
 
 // Configuración de controladores y JSON
 builder.Services.AddControllers()

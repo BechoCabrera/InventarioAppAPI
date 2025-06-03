@@ -2,9 +2,11 @@
 {
     public class UserDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Username { get; set; } = null!;
         public string Email { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Avatar { get; set; } = null!;
         public IList<string> Roles { get; set; } = new List<string>();
     }
 }

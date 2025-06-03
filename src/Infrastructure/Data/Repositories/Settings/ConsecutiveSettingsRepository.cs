@@ -1,0 +1,28 @@
+﻿using InventarioBackend.src.Core.Domain.Settings.Entities;
+using InventarioBackend.src.Core.Domain.Settings.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace InventarioBackend.src.Infrastructure.Data.Repositories.Settings
+{
+    public class ConsecutiveSettingsRepository : IConsecutiveSettingsRepository
+    {
+        private readonly AppDbContext _context;
+
+        public ConsecutiveSettingsRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<ConsecutiveSettings?> GetByNameAsync(string name)
+        {
+            return await _context.Set<ConsecutiveSettings>()
+                .FirstOrDefaultAsync(c => c.Name == name);
+        }
+
+        public async Task UpdateAsync(ConsecutiveSettings settings)
+        {
+            _context.Set<ConsecutiveSettings>().Update(settings);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

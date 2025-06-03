@@ -1,10 +1,12 @@
-﻿using InventarioBackend.Core.Domain.Billing;
+﻿using System;
+using System.Collections.Generic;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 
-namespace InventarioBackend.src.Core.Domain.Billing.Entities
+namespace InventarioBackend.Core.Application.Billing.DTOs
 {
-    public class Invoice
+    public class InvoiceDto
     {
-        public Guid InvoiceId { get; set; } = Guid.NewGuid();
+        public Guid InvoiceId { get; set; }
         public string InvoiceNumber { get; set; } = string.Empty;
         public Guid ClientId { get; set; }
         public DateTime IssueDate { get; set; }
@@ -14,10 +16,7 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? PaymentMethod { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
 
-        // Navegación
-        public List<InvoiceDetail> Details { get; set; } = new();
+        public List<InvoiceDetailDto> Details { get; set; } = new();
     }
 }

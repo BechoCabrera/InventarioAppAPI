@@ -45,7 +45,7 @@ public class TokenService : ITokenService
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             // Establecer la fecha de expiración del token
-            var expires = DateTime.Now.AddMinutes(5);
+            var expires = user.UserRoles.Any(r => r.Role.RoleName == "admin") ? DateTime.Now.AddMinutes(10) : DateTime.Now.AddHours(24);
 
             // Crear el token JWT
             var token = new JwtSecurityToken(
@@ -65,7 +65,7 @@ public class TokenService : ITokenService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception($"Error al generar el token: {ex.Message}");
         }
     }
 }
