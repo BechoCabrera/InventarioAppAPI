@@ -8,7 +8,7 @@ namespace InventarioBackend.src.Core.Domain.Products
         public Guid ProductId { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
         public int Stock { get; set; }
         public Guid? CategoryId { get; set; }       
         public bool IsActive { get; set; }
@@ -16,7 +16,7 @@ namespace InventarioBackend.src.Core.Domain.Products
         public DateTime? UpdatedAt { get; set; }
         public string? BarCode { get; set; }
         public Guid RegUserId { get; set; }
-        public User User { get; set; }
+        public User User { get; set; } = default!;
         public Category? Category { get; set; }
     }
 }

@@ -72,7 +72,7 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .HasForeignKey(ur => ur.RoleId);
             // Productos
             modelBuilder.Entity<Product>()
-                .Property(p => p.Price)
+                .Property(p => p.UnitPrice)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Product>()

@@ -46,4 +46,16 @@ public class ProductRepository : IProductRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task<List<Product>> SearchByNameAsync(string name)
+    {
+        return await _context.Products
+            .Where(p => p.Name.Contains(name))
+            .ToListAsync();
+    }
+
+    public async Task<Product?> GetByBarCodeAsync(string barCode)
+    {
+        return await _context.Products
+            .FirstOrDefaultAsync(p => p.BarCode == barCode);
+    }
 }

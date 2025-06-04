@@ -3,6 +3,7 @@ using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 
@@ -70,6 +71,18 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
             await _productRepository.DeleteAsync(id);
             return true;
+        }
+
+        public async Task<List<ProductDto>> SearchByNameAsync(string name)
+        {
+            var products = await _productRepository.SearchByNameAsync(name);
+            return products.Adapt<List<ProductDto>>();
+        }
+
+        public async Task<ProductDto?> GetByBarCodeAsync(string barCode)
+        {
+                var product = await _productRepository.GetByBarCodeAsync(barCode);
+            return product?.Adapt<ProductDto>();
         }
     }
 }

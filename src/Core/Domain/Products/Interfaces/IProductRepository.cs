@@ -10,5 +10,7 @@ namespace InventarioBackend.src.Core.Domain.Products.Interfaces
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(Guid product);
+        Task<List<Product>> SearchByNameAsync(string name);
+        Task<Product?> GetByBarCodeAsync(string barCode);
     }
 }

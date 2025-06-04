@@ -51,5 +51,24 @@ namespace InventarioBackend.src.Host.Controllers
             var success = await _productService.DeleteAsync(id);
             return success ? NoContent() : NotFound();
         }
+
+        // 🔍 Buscar por nombre
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchByName([FromQuery] string name)
+        {
+            var results = await _productService.SearchByNameAsync(name);
+            return Ok(results);
+        }
+
+        // 🔍 Buscar por código de barras
+        [HttpGet("barcode/{code}")]
+        public async Task<IActionResult> GetByBarCode(string code)
+        {
+            var product = await _productService.GetByBarCodeAsync(code);
+            if (product == null)
+                return NotFound();
+
+            return Ok(product);
+        }
     }
 }

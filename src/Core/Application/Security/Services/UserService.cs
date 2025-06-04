@@ -31,8 +31,8 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
             User? dbUser = await _userRepository.GetByIdAsync(Guid.Parse(id));
 
-         
 
+            if (dbUser == null) throw new Exception("No se encontro el usuario.");
             // Mapeamos los datos de la base de datos al DTO
             var dto = new UserDto
             {
