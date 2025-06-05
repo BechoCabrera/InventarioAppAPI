@@ -65,9 +65,7 @@ namespace InventarioBackend.src.Host.Controllers
         public async Task<IActionResult> GetByBarCode(string code)
         {
             var product = await _productService.GetByBarCodeAsync(code);
-            if (product == null)
-                return NotFound();
-
+            
             return Ok(product);
         }
     }

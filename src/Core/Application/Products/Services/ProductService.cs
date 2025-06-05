@@ -18,7 +18,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
         {
             _productRepository = productRepository;
             _httpContextAccessor = httpContextAccessor;
-        }  
+        }
 
         public async Task<List<ProductDto>> GetAllAsync()
         {
@@ -36,7 +36,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
         {
             var product = dto.Adapt<Product>();
             string? user = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(user!= null)
+            if (user != null)
             {
                 if (Guid.TryParse(user, out var parsedGuid))
                 {
@@ -49,7 +49,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             {
                 throw new Exception("Inicio de sesion finalizada, no se pudo completar la operacion.");
             }
-           
+
         }
 
         public async Task<bool> UpdateStatusAsync(Guid id, bool isActive)
@@ -81,7 +81,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
         public async Task<ProductDto?> GetByBarCodeAsync(string barCode)
         {
-                var product = await _productRepository.GetByBarCodeAsync(barCode);
+            var product = await _productRepository.GetByBarCodeAsync(barCode);
             return product?.Adapt<ProductDto>();
         }
     }
