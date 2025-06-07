@@ -22,13 +22,18 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
 
         public async Task<List<Invoice>> GetAllAsync()
         {
-            return await _dbSet.Include(i => i.Details).ToListAsync();
+            return await _dbSet
+                .Include(i => i.Client)
+                .Include(i => i.Details).ThenInclude(d => d.Product)
+                .ToListAsync();
         }
 
         public async Task<Invoice?> GetByIdAsync(Guid id)
         {
-            return await _dbSet.Include(i => i.Details)
-                               .FirstOrDefaultAsync(i => i.InvoiceId == id);
+            return await _dbSet
+                .Include(i => i.Client)
+                .Include(i => i.Details).ThenInclude(d => d.Product)
+                .FirstOrDefaultAsync(i => i.InvoiceId == id);
         }
 
         public async Task AddAsync(Invoice invoice)

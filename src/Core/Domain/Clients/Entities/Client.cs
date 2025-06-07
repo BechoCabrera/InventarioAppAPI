@@ -1,4 +1,7 @@
-﻿namespace InventarioBackend.src.Core.Domain.Clients.Entities
+﻿using InventarioBackend.src.Core.Domain.Billing.Entities;
+using InventarioBackend.src.Core.Domain.Security.Entities;
+
+namespace InventarioBackend.src.Core.Domain.Clients.Entities
 {
     public class Client
     {
@@ -10,5 +13,6 @@
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }
 }

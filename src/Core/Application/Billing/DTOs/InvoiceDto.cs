@@ -9,6 +9,7 @@ namespace InventarioBackend.Core.Application.Billing.DTOs
         public Guid InvoiceId { get; set; }
         public string InvoiceNumber { get; set; } = string.Empty;
         public Guid ClientId { get; set; }
+        public string ClientName { get; set; } = default!;
         public DateTime IssueDate { get; set; }
         public DateTime DueDate { get; set; }
         public decimal SubtotalAmount { get; set; }

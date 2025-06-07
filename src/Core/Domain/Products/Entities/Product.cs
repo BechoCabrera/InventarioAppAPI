@@ -1,4 +1,5 @@
-﻿using InventarioBackend.src.Core.Domain.Products.Entities;
+﻿using InventarioBackend.Core.Domain.Billing;
+using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 
 namespace InventarioBackend.src.Core.Domain.Products
@@ -18,5 +19,8 @@ namespace InventarioBackend.src.Core.Domain.Products
         public Guid RegUserId { get; set; }
         public User User { get; set; } = default!;
         public Category? Category { get; set; }
+
+        public ICollection<InvoiceDetail> InvoiceDetails { get; set; } = new List<InvoiceDetail>();
+
     }
 }

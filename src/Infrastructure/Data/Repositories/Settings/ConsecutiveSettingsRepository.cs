@@ -15,8 +15,16 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Settings
 
         public async Task<ConsecutiveSettings?> GetByNameAsync(string name)
         {
-            return await _context.Set<ConsecutiveSettings>()
-                .FirstOrDefaultAsync(c => c.Name == name);
+            try
+            {
+                var result = await _context.Set<ConsecutiveSettings>().FirstOrDefaultAsync(c => c.Name == name);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task UpdateAsync(ConsecutiveSettings settings)

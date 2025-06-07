@@ -5,6 +5,7 @@ using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
+using InventarioBackend.src.Core.Domain.Settings.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventarioBackend.src.Infrastructure.Data
@@ -26,6 +27,7 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
+        public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission
@@ -112,6 +114,22 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .WithOne(d => d.Invoice)
                 .HasForeignKey(d => d.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Client)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(i => i.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<InvoiceDetail>()
+                .HasOne(d => d.Product)
+                .WithMany(p => p.InvoiceDetails)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
 
             modelBuilder.ApplyConfiguration(new ProductConfig());
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
+using InventarioBackend.src.Core.Domain.Products;
 
 namespace InventarioBackend.Core.Domain.Billing
 {
@@ -16,5 +17,6 @@ namespace InventarioBackend.Core.Domain.Billing
 
         // Navegación
         public Invoice? Invoice { get; set; }
+        public Product Product { get; set; } = null!;
     }
 }

@@ -11,13 +11,16 @@ namespace InventarioBackend.Core.Application._Common.Mappings
         public void Register(TypeAdapterConfig config)
         {
             // Mapeo para Invoice con sus detalles
-            config.NewConfig<Invoice, InvoiceDto>();
+            config.NewConfig<Invoice, InvoiceDto>()
+                .Map(dest => dest.ClientName, src => src.Client.Name);
+
 
             // Mapeo para InvoiceCreateDto -> Invoice
             // (si tienes DTOs para creación y actualización, configúralos aquí)
 
             // Mapeo para InvoiceDetail <-> InvoiceDetailDto
-            config.NewConfig<InvoiceDetail, InvoiceDetailDto>();
+            config.NewConfig<InvoiceDetail, InvoiceDetailDto>()
+                .Map(dest => dest.ProductName, src => src.Product.Name);
             config.NewConfig<InvoiceDetailDto, InvoiceDetail>();
 
             config.NewConfig<InvoiceCreateDto, Invoice>();

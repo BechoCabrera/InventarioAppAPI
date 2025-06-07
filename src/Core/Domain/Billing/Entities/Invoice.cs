@@ -1,4 +1,5 @@
 ﻿using InventarioBackend.Core.Domain.Billing;
+using InventarioBackend.src.Core.Domain.Clients.Entities;
 
 namespace InventarioBackend.src.Core.Domain.Billing.Entities
 {
@@ -19,5 +20,6 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
 
         // Navegación
         public List<InvoiceDetail> Details { get; set; } = new();
+        public Client Client { get; set; } = default!;
     }
 }
