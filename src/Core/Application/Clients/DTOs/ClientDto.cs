@@ -8,5 +8,7 @@
         public string Email { get; set; } = default!;
         public string Phone { get; set; } = default!;
         public bool IsActive { get; set; }
+        public Guid? EntitiId { get; set; }
+        public string EntitiName { get; set; } = default!;
     }
 }

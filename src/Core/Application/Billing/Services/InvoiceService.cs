@@ -25,6 +25,11 @@ namespace InventarioBackend.Core.Application.Billing.Services
             var invoices = await _repository.GetAllAsync();
             return invoices.Adapt<List<InvoiceDto>>();
         }
+        public async Task<List<InvoiceDto>> GetByEntitiAsync(Guid id)
+        {
+            var invoices = await _repository.GetByEntitiAsync(id);
+            return invoices.Adapt<List<InvoiceDto>>();
+        }
 
         public async Task<InvoiceDto?> GetByIdAsync(Guid id)
         {
@@ -35,9 +40,7 @@ namespace InventarioBackend.Core.Application.Billing.Services
         public async Task AddAsync(InvoiceCreateDto dto)
         {
             var invoice = dto.Adapt<Invoice>();
-            dto.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
-
-
+            invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
             await _repository.AddAsync(invoice);
         }
 

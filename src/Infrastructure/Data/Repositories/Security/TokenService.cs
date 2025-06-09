@@ -29,7 +29,8 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
             new Claim(ClaimTypes.NameIdentifier.ToString(), user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+             new Claim("entiti_id", user.EntitiId.ToString())
         };
 
             // Añadir los roles como claims (Ahora estamos usando role.Name para agregar el nombre del rol)

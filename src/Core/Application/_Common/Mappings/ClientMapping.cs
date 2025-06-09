@@ -9,7 +9,8 @@ namespace InventarioBackend.Core.Application._Common.Mappings
         public void Register(TypeAdapterConfig config)
         {
             // Mapear entidad Client a ClientDto
-            config.NewConfig<Client, ClientDto>();
+            config.NewConfig<Client, ClientDto>()
+                .Map(dest => dest.EntitiName, src => src.EntitiConfigs.EntitiName);
 
             // Mapear DTO de creación a entidad Client
             config.NewConfig<ClientCreateDto, Client>();

@@ -5,6 +5,7 @@ namespace InventarioBackend.src.Core.Application.Clients.Interfaces
     public interface IClientService
     {
         Task<List<ClientDto>> GetAllAsync();
+        Task<List<ClientDto>> GetByEntitiAsync(Guid id);
         Task<ClientDto?> GetByIdAsync(Guid id);
         Task AddAsync(ClientCreateDto dto);
         Task UpdateAsync(Guid id, ClientUpdateDto dto);

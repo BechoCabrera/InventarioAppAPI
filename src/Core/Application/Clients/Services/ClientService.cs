@@ -19,6 +19,11 @@ public class ClientService : IClientService
     {
         var clients = await _clientRepository.GetAllAsync();
         return clients.Adapt<List<ClientDto>>();
+    } 
+    public async Task<List<ClientDto>> GetByEntitiAsync(Guid id)
+    {
+        var clients = await _clientRepository.GetByEntitiAsync(id);
+        return clients.Adapt<List<ClientDto>>();
     }
 
     public async Task<ClientDto?> GetByIdAsync(Guid id)

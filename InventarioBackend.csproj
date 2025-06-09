@@ -10,15 +10,19 @@
     <Compile Remove="src\Infrastructure\Configurations\**" />
     <Compile Remove="src\Infrastructure\Mapping\**" />
     <Compile Remove="src\Infrastructure\Repositories\**" />
+    <Compile Remove="src\Tests\**" />
     <Content Remove="src\Infrastructure\Configurations\**" />
     <Content Remove="src\Infrastructure\Mapping\**" />
     <Content Remove="src\Infrastructure\Repositories\**" />
+    <Content Remove="src\Tests\**" />
     <EmbeddedResource Remove="src\Infrastructure\Configurations\**" />
     <EmbeddedResource Remove="src\Infrastructure\Mapping\**" />
     <EmbeddedResource Remove="src\Infrastructure\Repositories\**" />
+    <EmbeddedResource Remove="src\Tests\**" />
     <None Remove="src\Infrastructure\Configurations\**" />
     <None Remove="src\Infrastructure\Mapping\**" />
     <None Remove="src\Infrastructure\Repositories\**" />
+    <None Remove="src\Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,8 +48,6 @@
     <Folder Include="src\Core\Shared\Entities\" />
     <Folder Include="src\Core\Shared\Interfaces\" />
     <Folder Include="src\Core\Shared\Services\" />
-    <Folder Include="src\Tests\IntegrationTests\" />
-    <Folder Include="src\Tests\UnitTests\" />
   </ItemGroup>
 
   <ItemGroup>

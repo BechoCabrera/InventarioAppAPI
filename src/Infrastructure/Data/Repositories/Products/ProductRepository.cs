@@ -14,7 +14,15 @@ public class ProductRepository : IProductRepository
         _context = context;
         _dbSet = context.Set<Product>();
     }
-
+    public async Task<List<Product>> GetByEntitiAsync(Guid entitiId)
+    {
+        return await _context.Products
+                             .Where(p => p.EntitiId == entitiId)
+                             .Include(x=>x.EntitiConfigs)
+                             .Include(a => a.Category)
+                             .Include(a => a.User)
+                             .ToListAsync();
+    }
     public async Task<Product?> GetByIdAsync(Guid id)
     {
         return await _dbSet.FindAsync(id);
@@ -22,7 +30,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        return await _dbSet.Include(p => p.User).Include(a=>a.Category).ToListAsync();
+        return await _dbSet.Include(p => p.User).Include(a=>a.Category).Include(p => p.EntitiConfigs).ToListAsync();
     }
 
     public async Task AddAsync(Product product)

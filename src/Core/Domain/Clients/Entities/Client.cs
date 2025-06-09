@@ -1,5 +1,5 @@
 ﻿using InventarioBackend.src.Core.Domain.Billing.Entities;
-using InventarioBackend.src.Core.Domain.Security.Entities;
+using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 
 namespace InventarioBackend.src.Core.Domain.Clients.Entities
 {
@@ -13,6 +13,8 @@ namespace InventarioBackend.src.Core.Domain.Clients.Entities
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public Guid? EntitiId { get; set; }
+        public EntitiConfig? EntitiConfigs { get; set; }
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }
 }

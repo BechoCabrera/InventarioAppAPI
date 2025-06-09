@@ -25,7 +25,11 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             var products = await _productRepository.GetAllAsync();
             return products.Adapt<List<ProductDto>>();
         }
-
+        public async Task<List<ProductDto>> GetByEntitiAsync(Guid entitiId)
+        {
+            var products = await _productRepository.GetByEntitiAsync(entitiId);
+            return products.Adapt<List<ProductDto>>();
+        }
         public async Task<ProductDto?> GetByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);

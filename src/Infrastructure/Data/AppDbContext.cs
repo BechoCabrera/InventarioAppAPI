@@ -2,6 +2,7 @@
 using InventarioBackend.Infrastructure.Data.EntityConfigurations;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Core.Domain.Clients.Entities;
+using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
@@ -28,6 +29,7 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
+        public DbSet<EntitiConfig> EntitiConfigs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission
@@ -83,9 +85,19 @@ namespace InventarioBackend.src.Infrastructure.Data
               .HasForeignKey(up => up.RegUserId);
 
             modelBuilder.Entity<Product>()
-          .HasOne(up => up.Category)
-          .WithMany(u => u.Products)
-          .HasForeignKey(up => up.CategoryId);
+              .HasOne(up => up.Category)
+              .WithMany(u => u.Products)
+              .HasForeignKey(up => up.CategoryId);
+
+            modelBuilder.Entity<Product>()
+              .HasOne(c => c.EntitiConfigs)
+              .WithMany()
+              .HasForeignKey(c => c.EntitiId);
+
+            modelBuilder.Entity<Category>()
+             .HasOne(c => c.EntitiConfigs)
+             .WithMany()
+             .HasForeignKey(c => c.EntitiId);
 
             // MenuItem relación jerárquica
             modelBuilder.Entity<MenuItem>()
@@ -121,6 +133,10 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .HasForeignKey(i => i.ClientId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Invoice>()
+                .HasOne(c => c.EntitiConfigs)
+                .WithMany()
+                .HasForeignKey(c => c.EntitiId);
 
             modelBuilder.Entity<InvoiceDetail>()
                 .HasOne(d => d.Product)
@@ -128,7 +144,10 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
+            modelBuilder.Entity<Client>()
+                .HasOne(c => c.EntitiConfigs)
+                .WithMany()
+                .HasForeignKey(c => c.EntitiId);
 
 
             modelBuilder.ApplyConfiguration(new ProductConfig());

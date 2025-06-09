@@ -12,7 +12,10 @@ namespace InventarioBackend.src.Core.Application.Products.DTOs
         public string? Category { get; set; }
         public Boolean IsActive { get; set; }
         public Guid RegUserId { get; set; }
+        public Guid? EntitiId { get; set; }
+
         public string BarCode { get; set; } = default!;  
+        public string? EntitiName { get; set; }
         public string? Username { get; set; }
         public string? CategoryName { get; set; }
     }

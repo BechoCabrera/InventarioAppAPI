@@ -2,6 +2,8 @@
 using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using InventarioBackend.src.Core.Application.Products.DTOs;
+using System.Security.Claims;
 
 namespace InventarioBackend.Host.Controllers
 {
@@ -18,10 +20,22 @@ namespace InventarioBackend.Host.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<List<InvoiceDto>>> GetAll()
         {
-            var invoices = await _invoiceService.GetAllAsync();
-            return Ok(invoices);
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (role == "ADMIN")
+            {
+                return Ok(await _invoiceService.GetAllAsync());
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+                var entitiId = Guid.Parse(entitiIdClaim);
+                var categorias = await _invoiceService.GetByEntitiAsync(entitiId);
+                return Ok(categorias);
+            }
         }
 
         [HttpGet("{id:guid}")]
@@ -37,6 +51,11 @@ namespace InventarioBackend.Host.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] InvoiceCreateDto dto)
         {
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+            dto.EntitiId = Guid.Parse(entitiIdClaim);
+            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

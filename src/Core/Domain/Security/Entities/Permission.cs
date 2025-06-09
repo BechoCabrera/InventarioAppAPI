@@ -6,8 +6,8 @@ namespace InventarioBackend.src.Core.Domain.Security.Entities
     public class Permission
     {
         public Guid PermissionId { get; set; }  // Identificador único del permiso
-        public string PermissionName { get; set; }  // Nombre del permiso
-        public string Description { get; set; }  // Descripción del permiso
+        public string PermissionName { get; set; } = default!;  // Nombre del permiso
+        public string Description { get; set; } = default!;  // Descripción del permiso
 
         // Relación muchos a muchos con Role
         public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();

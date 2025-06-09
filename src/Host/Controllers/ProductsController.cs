@@ -2,6 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InventarioBackend.src.Host.Controllers
 {
@@ -20,8 +21,21 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ProductDto>>> GetAll()
         {
-            var result = await _productService.GetAllAsync();
-            return Ok(result);
+
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (role == "ADMIN")
+            {
+                return Ok(await _productService.GetAllAsync());
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+                var entitiId = Guid.Parse(entitiIdClaim);
+                var productos = await _productService.GetByEntitiAsync(entitiId);
+                return Ok(productos);
+            }
         }
 
         [HttpGet("{id}")]
@@ -34,6 +48,10 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(ProductCreateDto dto)
         {
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+            dto.EntitiId = Guid.Parse(entitiIdClaim);
+
             var id = await _productService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }

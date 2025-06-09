@@ -17,7 +17,8 @@ namespace InventarioBackend.Core.Application.Billing.DTOs
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? PaymentMethod { get; set; }
-
+        public string? EntitiName { get; set; }
+        public Guid? EntitiId { get; set; }
         public List<InvoiceDetailDto> Details { get; set; } = new();
     }
 }

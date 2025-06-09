@@ -7,6 +7,7 @@ namespace InventarioBackend.src.Core.Application.Products.Interfaces
     {
          Task<List<Category>> GetAllAsync();
         Task<Category?> GetByIdAsync(Guid id);
+        Task<List<Category>> GetByEntitiAsync(Guid id);
         Task AddAsync(Category category);
         Task UpdateAsync(Category category);
         Task DeleteAsync(Guid id);

@@ -5,8 +5,8 @@
         public Guid MenuItemId { get; set; }
         public Guid PermissionId { get; set; }
 
-        public MenuItem MenuItem { get; set; }
-        public Permission Permission { get; set; }
+        public MenuItem MenuItem { get; set; } = default!;
+        public Permission Permission { get; set; } = default!;
 
     }
 }

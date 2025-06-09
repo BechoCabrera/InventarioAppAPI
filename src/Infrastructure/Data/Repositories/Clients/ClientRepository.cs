@@ -20,10 +20,30 @@ public class ClientRepository : IClientRepository
     {
         return await _dbSet.FindAsync(id);
     }
-
+    public async Task<List<Client>> GetByEntitiAsync(Guid entitiId)
+    {
+        try
+        {
+            return await _context.Clients
+                             .Where(c => c.EntitiId == entitiId).Include(a=>a.EntitiConfigs)
+                             .ToListAsync();
+        }
+        catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+        
+    }
     public async Task<List<Client>> GetAllAsync()
     {
-        return await _dbSet.ToListAsync();
+        try
+        {
+            return await _dbSet.Include(a=>a.EntitiConfigs).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public async Task AddAsync(Client client)

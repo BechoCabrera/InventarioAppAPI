@@ -14,10 +14,16 @@ namespace Infrastructure.Data.Repositories.Products
         {
             _context = context;
         }
-
+        public async Task<List<Category>> GetByEntitiAsync(Guid entitiId)
+        {
+            return await _context.Categories
+                                 .Where(c => c.EntitiId == entitiId)
+                                 .Include(a=>a.EntitiConfigs)
+                                 .ToListAsync();
+        }
         public async Task<List<Category>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.Include(a => a.EntitiConfigs).ToListAsync();
         }
 
         public async Task<Category?> GetByIdAsync(Guid id)

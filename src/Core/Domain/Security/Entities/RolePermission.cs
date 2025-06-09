@@ -6,6 +6,6 @@
         public Role Role { get; set; }
 
         public Guid PermissionId { get; set; }
-        public Permission Permission { get; set; }
+        public Permission Permission { get; set; } = default!;
     }
 }

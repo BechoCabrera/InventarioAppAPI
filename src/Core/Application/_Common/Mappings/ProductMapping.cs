@@ -2,6 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.Products;
+using InventarioBackend.src.Core.Domain.Products.Entities;
 using Mapster;
 
 namespace InventarioBackend.src.Core.Application._Common.Mappings
@@ -14,8 +15,12 @@ namespace InventarioBackend.src.Core.Application._Common.Mappings
             config.NewConfig<Product, ProductDto>()
               .Map(dest => dest.Username, src => src.User.Name)
               .Map(dest => dest.CategoryName, src => src.Category!.Name)
-              ;
+              .Map(dest => dest.EntitiName, src => src.EntitiConfigs.EntitiName);
+                ;
 
+            config.NewConfig<Category, CategoryDto>()
+            .Map(dest => dest.EntitiName, src => src.EntitiConfigs.EntitiName); 
+            ;
             config.NewConfig<ProductCreateDto, Product>();
             config.NewConfig<ProductUpdateDto, Product>()
                   .Ignore(dest => dest.CreatedAt); // No tocar esta propiedad al actualizar

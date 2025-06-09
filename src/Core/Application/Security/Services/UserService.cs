@@ -22,7 +22,7 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
             var id = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "0";
             var email = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "no-email@example.com";
-            
+
 
             var roles = user.Claims
                 .Where(c => c.Type == ClaimTypes.Role)
@@ -31,6 +31,11 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
             User? dbUser = await _userRepository.GetByIdAsync(Guid.Parse(id));
 
+            var permissionList = dbUser.UserRoles
+                .SelectMany(ur => ur.Role.RolePermissions)
+                .Select(rp => rp.Permission.PermissionName)
+                .Distinct()
+                .ToList();
 
             if (dbUser == null) throw new Exception("No se encontro el usuario.");
             // Mapeamos los datos de la base de datos al DTO
@@ -41,7 +46,8 @@ namespace InventarioBackend.src.Core.Application.Security.Services
                 Email = dbUser.Email,
                 Roles = roles,
                 Avatar = dbUser.Avatar ?? "default-avatar.png",  // Si no tiene avatar, ponemos un valor por defecto
-                Name = dbUser.Name ?? dbUser.Username  // Si no tiene nombre, usamos el username
+                Name = dbUser.Name ?? dbUser.Username,  // Si no tiene nombre, usamos el username
+                Permissions = permissionList
             };
 
 

@@ -87,7 +87,10 @@
     "clientes.actualizar-cliente": "Actualizar Cliente",
     "facturacion": "Facturación",
     "facturacion.crear-factura": "Crear factura",
-    "facturacion.historial-facturas": "Historial de facturas"
+    "facturacion.historial-facturas": "Historial de facturas",
+    "entiti-config": "Configuración de Entidad",
+    "entiti-config.entiti-config.crear": "Crear entidad",
+    "entiti-config.entiti-config.editar": "Editar entidad"
   },
     "validation": {
         "required": "Este campo es obligatorio",

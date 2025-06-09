@@ -24,6 +24,15 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         {
             return await _dbSet
                 .Include(i => i.Client)
+                .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)
+                .ToListAsync();
+        } 
+        
+        public async Task<List<Invoice>> GetByEntitiAsync(Guid id)
+        {
+            return await _dbSet.Where(a=>a.EntitiId == id)
+                .Include(i => i.Client)
+                .Include(i => i.EntitiConfigs)
                 .Include(i => i.Details).ThenInclude(d => d.Product)
                 .ToListAsync();
         }
@@ -32,14 +41,22 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         {
             return await _dbSet
                 .Include(i => i.Client)
-                .Include(i => i.Details).ThenInclude(d => d.Product)
+                .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
         }
 
         public async Task AddAsync(Invoice invoice)
         {
-            await _dbSet.AddAsync(invoice);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _dbSet.AddAsync(invoice);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception();
+            }
+           
         }
 
         public async Task UpdateAsync(Invoice invoice)

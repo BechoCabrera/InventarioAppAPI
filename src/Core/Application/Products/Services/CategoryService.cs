@@ -16,6 +16,12 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             _repository = repository;
         }
 
+        public async Task<List<CategoryDto>> GetByEntitiAsync(Guid entitiId)
+        {
+            var categorias = await _repository.GetByEntitiAsync(entitiId);
+            return categorias.Adapt<List<CategoryDto>>();
+        }
+
         public async Task<List<CategoryDto>> GetAllAsync() =>
             (await _repository.GetAllAsync()).Adapt<List<CategoryDto>>();
 

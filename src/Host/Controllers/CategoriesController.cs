@@ -5,6 +5,7 @@ using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,8 +21,20 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetAll()
     {
-        var result = await _service.GetAllAsync();
-        return Ok(result);
+        var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+        var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        if (role == "ADMIN")
+        {
+            return Ok(await _service.GetAllAsync());
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+            var entitiId = Guid.Parse(entitiIdClaim);
+            var categorias = await _service.GetByEntitiAsync(entitiId);
+            return Ok(categorias);
+        }
     }
 
     [HttpGet("{id}")]
@@ -34,6 +47,9 @@ public class CategoriesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync(Category dto)
     {
+        var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+        if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+        dto.EntitiId = Guid.Parse(entitiIdClaim);
         var id = await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id }, null);
     }

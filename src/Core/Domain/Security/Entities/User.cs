@@ -1,10 +1,12 @@
-﻿using InventarioBackend.src.Core.Domain.Products;
+﻿using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
+using InventarioBackend.src.Core.Domain.Products;
 
 namespace InventarioBackend.src.Core.Domain.Security.Entities
 {
     public class User
     {
         public Guid UserId { get; set; }
+        public Guid? EntitiId { get; set; }
         public string Username { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
@@ -14,6 +16,7 @@ namespace InventarioBackend.src.Core.Domain.Security.Entities
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; }
 
+        //public EntitiConfig? EntitiConfigs { get; set; } = null;
         public ICollection<Product> Products { get; set; } = new List<Product>();
         // Relación muchos a muchos con Roles
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

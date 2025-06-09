@@ -1,4 +1,6 @@
 ﻿using InventarioBackend.Core.Domain.Billing;
+using InventarioBackend.src.Core.Application.EntitiConfigs.Services;
+using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 using InventarioBackend.src.Core.Domain.Products.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 
@@ -7,6 +9,7 @@ namespace InventarioBackend.src.Core.Domain.Products
     public class Product
     {
         public Guid ProductId { get; set; }
+        public Guid? EntitiId { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
         public decimal UnitPrice { get; set; }
@@ -19,8 +22,10 @@ namespace InventarioBackend.src.Core.Domain.Products
         public Guid RegUserId { get; set; }
         public User User { get; set; } = default!;
         public Category? Category { get; set; }
-
+        public EntitiConfig? EntitiConfigs { get; set; }
         public ICollection<InvoiceDetail> InvoiceDetails { get; set; } = new List<InvoiceDetail>();
+        //public EntitiConfig? EntitiConfigs { get; set; }
+
 
     }
 }

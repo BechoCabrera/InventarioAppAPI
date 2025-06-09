@@ -12,7 +12,9 @@ namespace InventarioBackend.Core.Application._Common.Mappings
         {
             // Mapeo para Invoice con sus detalles
             config.NewConfig<Invoice, InvoiceDto>()
-                .Map(dest => dest.ClientName, src => src.Client.Name);
+                .Map(dest => dest.ClientName, src => src.Client.Name)
+                .Map(dest => dest.EntitiName, src => src.EntitiConfigs.EntitiName); 
+            
 
 
             // Mapeo para InvoiceCreateDto -> Invoice

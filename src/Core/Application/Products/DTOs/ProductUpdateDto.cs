@@ -8,6 +8,7 @@
         public decimal UnitPrice { get; set; }
         public int Stock { get; set; }
         public Guid? CategoryId { get; set; }
+        public Guid? EntitiId { get; set; }
         public bool IsActive { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace InventarioBackend.src.Core.Application.Products.Interfaces
     {
         Task<List<ProductDto>> GetAllAsync();
         Task<ProductDto?> GetByIdAsync(Guid id);
+        Task<List<ProductDto>> GetByEntitiAsync(Guid id);
         Task<Guid> CreateAsync(ProductCreateDto dto);
         //Task<ProductDto?> UpdateAsync(Guid id, ProductDto dto);
         Task<bool> DeleteAsync(Guid id);
