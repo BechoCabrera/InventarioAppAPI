@@ -45,6 +45,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
                 if (Guid.TryParse(user, out var parsedGuid))
                 {
                     product.RegUserId = parsedGuid;
+                    product.StockSold = 0;
                 }
                 await _productRepository.AddAsync(product);
                 return product.ProductId;

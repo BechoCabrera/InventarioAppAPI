@@ -14,6 +14,7 @@ namespace InventarioBackend.src.Core.Domain.Products
         public string Description { get; set; } = default!;
         public decimal UnitPrice { get; set; }
         public int Stock { get; set; }
+        public int StockSold { get; set; }
         public Guid? CategoryId { get; set; }       
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
