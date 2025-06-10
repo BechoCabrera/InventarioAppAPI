@@ -67,6 +67,12 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
             await _productRepository.UpdateAsync(existing);
             return true;
+        }  
+        
+        public async Task<bool> UpdateAsync(Product value)
+        {
+            await _productRepository.UpdateAsync(value);
+            return true;
         }
 
         public async Task<bool> DeleteAsync(Guid id)

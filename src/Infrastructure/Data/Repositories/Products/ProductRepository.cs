@@ -41,7 +41,17 @@ public class ProductRepository : IProductRepository
 
     public async Task UpdateAsync(Product product)
     {
-        _dbSet.Update(product);
+        var trackedEntity = await _context.Products.FindAsync(product.ProductId);
+
+        if (trackedEntity != null)
+        {
+            _context.Entry(trackedEntity).CurrentValues.SetValues(product);
+        }
+        else
+        {
+            _dbSet.Update(product);
+        }
+
         await _context.SaveChangesAsync();
     }
 

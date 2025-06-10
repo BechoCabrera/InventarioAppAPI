@@ -1,8 +1,11 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
+using InventarioBackend.src.Core.Application.Products.DTOs;
+using InventarioBackend.src.Core.Application.Products.Services;
 using InventarioBackend.src.Core.Application.Settings.Services;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
+using InventarioBackend.src.Core.Domain.Products;
 using Mapster;
 using System;
 using System.Collections.Generic;
@@ -14,8 +17,11 @@ namespace InventarioBackend.Core.Application.Billing.Services
     {
         private readonly IInvoiceRepository _repository;
         private readonly ConsecutiveSettingsService _consecutiveSettingsService;
-        public InvoiceService(IInvoiceRepository repository, ConsecutiveSettingsService consecutiveSettingsService)
+        private readonly ProductService _productService;
+        public InvoiceService(IInvoiceRepository repository, ConsecutiveSettingsService consecutiveSettingsService,
+            ProductService productService)
         {
+            _productService = productService;
             _repository = repository;
             _consecutiveSettingsService = consecutiveSettingsService;
         }
@@ -41,6 +47,21 @@ namespace InventarioBackend.Core.Application.Billing.Services
         {
             var invoice = dto.Adapt<Invoice>();
             invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
+
+            foreach (var item in invoice.Details)
+            {
+                ProductDto? valueProduct = await _productService.GetByIdAsync(item.ProductId);
+                if (valueProduct != null && valueProduct.Stock >= valueProduct.StockSold)
+                {
+                    valueProduct.StockSold = item.Quantity + valueProduct.StockSold;
+                    Product val = new Product();
+                    val.ProductId = item.ProductId;
+                    val.StockSold = valueProduct.StockSold;
+
+                    await _productService.UpdateAsync(val);
+                }               
+            }
+            
             await _repository.AddAsync(invoice);
         }
 
