@@ -36,6 +36,12 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             return product?.Adapt<ProductDto>();
         }
 
+        public async Task<Product?> GetByIdDomAsync(Guid id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            return product;
+        }
+
         public async Task<Guid> CreateAsync(ProductCreateDto dto)
         {
             var product = dto.Adapt<Product>();
@@ -57,15 +63,20 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
         }
 
-        public async Task<bool> UpdateStatusAsync(Guid id, bool isActive)
+        public async Task<bool> UpdateAsync(ProductUpdateDto product)
         {
-            var existing = await _productRepository.GetByIdAsync(id);
-            if (existing == null) return false;
+            var existingProduct = await _productRepository.GetByIdAsync(product.ProductId);
+            if (existingProduct == null) return false;
 
-            existing.IsActive = isActive;
-            existing.UpdatedAt = DateTime.UtcNow;
+            existingProduct.UpdatedAt = DateTime.UtcNow;
+            existingProduct.Name = product.Name;
+            existingProduct.UnitPrice = product.UnitPrice;
+            existingProduct.Description = product.Description;
+            existingProduct.Stock = product.Stock + existingProduct.Stock;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.IsActive = product.IsActive;
 
-            await _productRepository.UpdateAsync(existing);
+            await _productRepository.UpdateAsync(existingProduct);
             return true;
         }  
         
@@ -84,15 +95,15 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             return true;
         }
 
-        public async Task<List<ProductDto>> SearchByNameAsync(string name)
+        public async Task<List<ProductDto>> SearchByNameAsync(string name, Guid entitiId)
         {
-            var products = await _productRepository.SearchByNameAsync(name);
+            var products = await _productRepository.SearchByNameAsync(name, entitiId);
             return products.Adapt<List<ProductDto>>();
         }
 
-        public async Task<ProductDto?> GetByBarCodeAsync(string barCode)
+        public async Task<ProductDto?> GetByBarCodeAsync(string barCode, Guid entitiId)
         {
-            var product = await _productRepository.GetByBarCodeAsync(barCode);
+            var product = await _productRepository.GetByBarCodeAsync(barCode, entitiId);
             return product?.Adapt<ProductDto>();
         }
     }

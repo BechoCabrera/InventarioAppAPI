@@ -10,11 +10,10 @@ namespace InventarioBackend.src.Core.Application.Products.Interfaces
         Task<ProductDto?> GetByIdAsync(Guid id);
         Task<List<ProductDto>> GetByEntitiAsync(Guid id);
         Task<Guid> CreateAsync(ProductCreateDto dto);
-        //Task<ProductDto?> UpdateAsync(Guid id, ProductDto dto);
         Task<bool> DeleteAsync(Guid id);
-        Task<bool> UpdateStatusAsync(Guid id, bool isActive);
-        Task<List<ProductDto>> SearchByNameAsync(string name);
-        Task<ProductDto?> GetByBarCodeAsync(string barCode);
+        Task<bool> UpdateAsync(ProductUpdateDto product);
+        Task<List<ProductDto>> SearchByNameAsync(string name, Guid entitiId);
+        Task<ProductDto?> GetByBarCodeAsync(string barCode, Guid entitiId);
     }
 
 }

@@ -54,7 +54,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             }
             catch(Exception ex)
             {
-                throw new Exception();
+                throw new Exception(ex.Message);
             }
            
         }

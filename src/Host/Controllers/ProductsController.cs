@@ -1,5 +1,6 @@
 ﻿using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Interfaces;
+using InventarioBackend.src.Core.Domain.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -57,10 +58,27 @@ namespace InventarioBackend.src.Host.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, bool isActive)
+        public async Task<IActionResult> Update(Guid id, ProductUpdateDto product)
         {
-            var success = await _productService.UpdateStatusAsync(id, isActive);
-            return success ? NoContent() : NotFound();
+            if (id != product.ProductId)
+            {
+                return BadRequest("El ID del producto no coincide.");
+            }
+
+            try
+            {
+                var updatedProduct = await _productService.UpdateAsync(product);
+                if (updatedProduct == null)
+                {
+                    return NotFound("Producto no encontrado.");
+                }
+
+                return Ok(new { message = $"{updatedProduct}" });  // Retorna el producto actualizado
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);  // Maneja los errores
+            }
         }
 
         [HttpDelete("{id}")]
@@ -74,7 +92,12 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchByName([FromQuery] string name)
         {
-            var results = await _productService.SearchByNameAsync(name);
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+            var entitiId = Guid.Parse(entitiIdClaim);
+
+            var results = await _productService.SearchByNameAsync(name, entitiId);
             return Ok(results);
         }
 
@@ -82,9 +105,14 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpGet("barcode/{code}")]
         public async Task<IActionResult> GetByBarCode(string code)
         {
-            var product = await _productService.GetByBarCodeAsync(code);
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+            var entitiId = Guid.Parse(entitiIdClaim);
+            var product = await _productService.GetByBarCodeAsync(code, entitiId);
             
             return Ok(product);
         }
+
     }
 }

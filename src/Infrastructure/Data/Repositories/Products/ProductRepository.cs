@@ -18,7 +18,7 @@ public class ProductRepository : IProductRepository
     {
         return await _context.Products
                              .Where(p => p.EntitiId == entitiId)
-                             .Include(x=>x.EntitiConfigs)
+                             .Include(x => x.EntitiConfigs)
                              .Include(a => a.Category)
                              .Include(a => a.User)
                              .ToListAsync();
@@ -30,7 +30,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        return await _dbSet.Include(p => p.User).Include(a=>a.Category).Include(p => p.EntitiConfigs).ToListAsync();
+        return await _dbSet.Include(p => p.User).Include(a => a.Category).Include(p => p.EntitiConfigs).ToListAsync();
     }
 
     public async Task AddAsync(Product product)
@@ -41,17 +41,7 @@ public class ProductRepository : IProductRepository
 
     public async Task UpdateAsync(Product product)
     {
-        var trackedEntity = await _context.Products.FindAsync(product.ProductId);
-
-        if (trackedEntity != null)
-        {
-            _context.Entry(trackedEntity).CurrentValues.SetValues(product);
-        }
-        else
-        {
-            _dbSet.Update(product);
-        }
-
+        _dbSet.Update(product);
         await _context.SaveChangesAsync();
     }
 
@@ -64,16 +54,17 @@ public class ProductRepository : IProductRepository
             await _context.SaveChangesAsync();
         }
     }
-    public async Task<List<Product>> SearchByNameAsync(string name)
+    public async Task<List<Product>> SearchByNameAsync(string name, Guid entitiId)
     {
-        return await _context.Products
-            .Where(p => p.Name.Contains(name))
+
+        return await _context.Products.Include(p => p.EntitiConfigs)
+            .Where(p => p.Name.Contains(name) && p.EntitiId == entitiId)
             .ToListAsync();
     }
 
-    public async Task<Product?> GetByBarCodeAsync(string barCode)
+    public async Task<Product?> GetByBarCodeAsync(string barCode, Guid entitiId)
     {
-        return await _context.Products
-            .FirstOrDefaultAsync(p => p.BarCode == barCode);
+        return await _context.Products.Include(p => p.EntitiConfigs)
+            .FirstOrDefaultAsync(p => p.BarCode == barCode && p.EntitiId == entitiId);
     }
 }
