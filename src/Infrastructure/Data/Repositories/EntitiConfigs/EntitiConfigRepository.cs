@@ -1,4 +1,5 @@
-﻿using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
+﻿using InventarioBackend.src.Core.Application.EntitiConfigs.DTOs;
+using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 using InventarioBackend.src.Core.Domain.EntitiConfigs.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,10 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.EntitiConfigs
         public async Task<List<EntitiConfig>> GetAllAsync()
         {
             return await _context.EntitiConfigs.ToListAsync();
+        }
+        public async Task<EntitiConfig?> GetByIdEntitiAsync(Guid id)
+        {
+            return await _context.EntitiConfigs.FirstOrDefaultAsync(x => x.EntitiConfigId == id);
         }
         public async Task<bool> DeleteAsync(EntitiConfig entity)
         {
@@ -52,6 +57,7 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.EntitiConfigs
             existing.EntitiNit = entity.EntitiNit;
             existing.EntitiAddress = entity.EntitiAddress;
             existing.Description = entity.Description;
+            existing.EntitiPhone = entity.EntitiPhone;
 
             await _context.SaveChangesAsync();
             return existing;

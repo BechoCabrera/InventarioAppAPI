@@ -26,6 +26,11 @@ namespace InventarioBackend.src.Core.Application.EntitiConfigs.Services
         {
             var entity = await _repository.GetAllAsync();
             return entity.Adapt<List<EntitiConfigDto>>();
+        } 
+        public async Task<EntitiConfigDto> GetByIdEntitiAsync(Guid id)
+        {
+            var entity = await _repository.GetByIdEntitiAsync(id);
+            return entity.Adapt<EntitiConfigDto>();
         }
         public async Task<EntitiConfigDto> CreateAsync(EntitiConfigCreateDto dto)
         {

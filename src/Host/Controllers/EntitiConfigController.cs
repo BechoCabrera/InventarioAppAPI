@@ -1,5 +1,6 @@
 ﻿using InventarioBackend.src.Core.Application.EntitiConfigs.DTOs;
 using InventarioBackend.src.Core.Application.EntitiConfigs.Interfaces;
+using InventarioBackend.src.Core.Application.EntitiConfigs.Services;
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,5 +69,21 @@ public class EntitiConfigController : ControllerBase
     {
        var result = await _service.DeleteAsync(id);
         return Ok(new { message = $"{result}" });
+    }
+
+    [HttpGet("myentiti")]
+    public async Task<IActionResult> GetMyEntiti()
+    {
+        var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+        if (string.IsNullOrEmpty(entitiIdClaim))
+            return Unauthorized();
+        var entitiId = Guid.Parse(entitiIdClaim);
+
+        var entiti = await _service.GetByIdEntitiAsync(entitiId); // tu método habitual
+
+        if (entiti == null)
+            return NotFound();
+
+        return Ok(new { data = entiti });
     }
 }
