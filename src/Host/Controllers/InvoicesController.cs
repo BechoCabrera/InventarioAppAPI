@@ -59,8 +59,8 @@ namespace InventarioBackend.Host.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _invoiceService.AddAsync(dto);
-            return Ok();
+            var result = await _invoiceService.AddAsync(dto);
+            return Ok(result);
         }
 
         [HttpPut("{id:guid}")]

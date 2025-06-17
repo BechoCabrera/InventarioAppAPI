@@ -19,7 +19,7 @@ public class ClientService : IClientService
     {
         var clients = await _clientRepository.GetAllAsync();
         return clients.Adapt<List<ClientDto>>();
-    } 
+    }
     public async Task<List<ClientDto>> GetByEntitiAsync(Guid id)
     {
         var clients = await _clientRepository.GetByEntitiAsync(id);
@@ -38,14 +38,18 @@ public class ClientService : IClientService
         await _clientRepository.AddAsync(client);
     }
 
-    public async Task UpdateAsync(Guid id, ClientUpdateDto dto)
+    public async Task<bool> UpdateAsync(Guid id, ClientUpdateDto dto)
     {
         var client = await _clientRepository.GetByIdAsync(id);
-        if (client == null) return;
-
-        dto.Adapt(client);
+        if (client == null) return false;
+        client.Name = dto.Name;
+        client.Nit = dto.Nit;
+        client.Email = dto.Email;
+        client.Phone = dto.Phone;
         client.UpdatedAt = DateTime.UtcNow;
-        await _clientRepository.UpdateAsync(client);
+
+        var result = await _clientRepository.UpdateAsync(client);
+        return result;
     }
 
     public async Task DeleteAsync(Guid id)

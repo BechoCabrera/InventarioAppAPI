@@ -52,10 +52,18 @@ public class ClientRepository : IClientRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Client client)
+    public async Task<bool> UpdateAsync(Client client)
     {
-        _dbSet.Update(client);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _dbSet.Update(client);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch(Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }         
     }
 
     public async Task DeleteAsync(Guid id)

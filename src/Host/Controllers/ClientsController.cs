@@ -49,8 +49,27 @@ public class ClientsController : ControllerBase
             var result = await _service.GetByEntitiAsync(entitiId);
             return Ok(result);
         }
+    }
 
-            
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, ClientUpdateDto clientDto)
+    {
+        if (id != clientDto.ClientId)
+        {
+            return BadRequest("El ID del cliente no coincide.");
+        }
+
+        try
+        {
+            var updatedClient = await _service.UpdateAsync(id, clientDto);
+
+            return Ok(new { message = $"{updatedClient}" });
+
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);  // Manejo de errores
+        }
     }
     // Agrega Update, Delete, GetById igual que en ProductsController
 }

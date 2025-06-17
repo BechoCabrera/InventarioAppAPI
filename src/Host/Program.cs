@@ -126,13 +126,16 @@ builder.Services.AddSwaggerGen(c =>
 // Política CORS para Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularClient", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
+   options.AddPolicy("AllowAngularClient", policy =>
+{
+    policy.WithOrigins(
+        "http://localhost:4200",
+        "http://securityreport.fisegroup.com" // 👈 producción
+    )
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials();
+});
 });
 
 var app = builder.Build();

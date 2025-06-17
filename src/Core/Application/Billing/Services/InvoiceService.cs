@@ -43,11 +43,11 @@ namespace InventarioBackend.Core.Application.Billing.Services
             return invoice?.Adapt<InvoiceDto>();
         }
 
-        public async Task AddAsync(InvoiceCreateDto dto)
+        public async Task<InvoiceDto> AddAsync(InvoiceCreateDto dto)
         {
             var invoice = dto.Adapt<Invoice>();
             invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
-
+            invoice.DueDate = DateTime.Now;
             foreach (var item in invoice.Details)
             {
                 Product? valueProduct = await _productService.GetByIdDomAsync(item.ProductId);
@@ -57,8 +57,10 @@ namespace InventarioBackend.Core.Application.Billing.Services
                     await _productService.UpdateAsync(valueProduct);
                 }               
             }
-            
-            await _repository.AddAsync(invoice);
+
+            var savedInvoice = await _repository.AddAsync(invoice);
+
+            return savedInvoice.Adapt<InvoiceDto>();
         }
 
         public async Task UpdateAsync(Guid id, InvoiceCreateDto dto)

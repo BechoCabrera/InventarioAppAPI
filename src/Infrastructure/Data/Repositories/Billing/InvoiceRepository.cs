@@ -33,7 +33,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             return await _dbSet.Where(a=>a.EntitiId == id)
                 .Include(i => i.Client)
                 .Include(i => i.EntitiConfigs)
-                .Include(i => i.Details).ThenInclude(d => d.Product)
+                .Include(i => i.Details).ThenInclude(d => d.Product).OrderByDescending(a=>a.DueDate)
                 .ToListAsync();
         }
 
@@ -45,18 +45,19 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
         }
 
-        public async Task AddAsync(Invoice invoice)
+        public async Task<Invoice> AddAsync(Invoice invoice)
         {
             try
             {
                 await _dbSet.AddAsync(invoice);
                 await _context.SaveChangesAsync();
+                await _context.Entry(invoice).Reference(i => i.Client).LoadAsync();
+                return invoice;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-           
         }
 
         public async Task UpdateAsync(Invoice invoice)

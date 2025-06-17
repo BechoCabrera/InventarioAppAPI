@@ -8,7 +8,7 @@ namespace InventarioBackend.src.Core.Application.Clients.Interfaces
         Task<List<ClientDto>> GetByEntitiAsync(Guid id);
         Task<ClientDto?> GetByIdAsync(Guid id);
         Task AddAsync(ClientCreateDto dto);
-        Task UpdateAsync(Guid id, ClientUpdateDto dto);
+        Task<bool> UpdateAsync(Guid id, ClientUpdateDto dto);
         Task DeleteAsync(Guid id);
     }
 }

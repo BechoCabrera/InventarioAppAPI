@@ -11,7 +11,7 @@ namespace InventarioBackend.Core.Domain.Billing.Interfaces
         Task<List<Invoice>> GetAllAsync();
         Task<List<Invoice>> GetByEntitiAsync(Guid id);
         Task<Invoice?> GetByIdAsync(Guid id);
-        Task AddAsync(Invoice invoice);
+        Task<Invoice> AddAsync(Invoice invoice);
         Task UpdateAsync(Invoice invoice);
         Task DeleteAsync(Guid id);
     }
