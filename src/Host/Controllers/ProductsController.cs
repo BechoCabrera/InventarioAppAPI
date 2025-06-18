@@ -85,7 +85,7 @@ namespace InventarioBackend.src.Host.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _productService.DeleteAsync(id);
-            return success ? NoContent() : NotFound();
+            return Ok(new { message = $"{success}" });
         }
 
         // 🔍 Buscar por nombre

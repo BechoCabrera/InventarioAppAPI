@@ -45,14 +45,22 @@ public class ProductRepository : IProductRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        var product = await _context.Products.FindAsync(id);
-        if (product != null)
+        try
         {
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();                
+            }
         }
+        catch (Exception ex)
+        {
+            return false;
+        }
+        return true;
     }
     public async Task<List<Product>> SearchByNameAsync(string name, Guid entitiId)
     {

@@ -91,8 +91,8 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null) return false;
 
-            await _productRepository.DeleteAsync(id);
-            return true;
+            var result = await _productRepository.DeleteAsync(id);
+            return result;
         }
 
         public async Task<List<ProductDto>> SearchByNameAsync(string name, Guid entitiId)
