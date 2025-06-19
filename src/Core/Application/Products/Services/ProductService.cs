@@ -53,6 +53,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
                     product.RegUserId = parsedGuid;
                     product.StockSold = 0;
                 }
+                product.Name = dto.Name.Trim();
                 await _productRepository.AddAsync(product);
                 return product.ProductId;
             }
