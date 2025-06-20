@@ -75,5 +75,12 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<List<Invoice>> GetInvoicesByDateAsync(DateTime date, Guid entitiId)
+        {
+            return await _context.Invoices
+                .Where(invoice => invoice.IssueDate.Date == date.Date && invoice.EntitiId == entitiId)
+                .ToListAsync();
+        }
     }
 }

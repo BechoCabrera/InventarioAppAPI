@@ -1,6 +1,7 @@
 ﻿using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.Infrastructure.Data.EntityConfigurations;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
+using InventarioBackend.src.Core.Domain.CashClosings.Entities;
 using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 using InventarioBackend.src.Core.Domain.Products;
@@ -30,6 +31,7 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
         public DbSet<EntitiConfig> EntitiConfigs { get; set; }
+        public DbSet<CashClosing> CashClosings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission

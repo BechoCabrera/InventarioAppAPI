@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace InventarioBackend.Core.Domain.Billing.Interfaces
 {
@@ -14,5 +15,6 @@ namespace InventarioBackend.Core.Domain.Billing.Interfaces
         Task<Invoice> AddAsync(Invoice invoice);
         Task UpdateAsync(Invoice invoice);
         Task DeleteAsync(Guid id);
+        Task<List<Invoice>> GetInvoicesByDateAsync(DateTime date, Guid entitiId);
     }
 }

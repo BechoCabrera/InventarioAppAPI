@@ -79,5 +79,17 @@ namespace InventarioBackend.Host.Controllers
             await _invoiceService.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpGet("byDate")]
+        public async Task<IActionResult> GetInvoicesByDate(DateTime date)
+        {
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+            var entitiId = Guid.Parse(entitiIdClaim);
+
+            var invoices = await _invoiceService.GetInvoicesByDateAsync(date, entitiId);
+            return Ok(invoices);
+        }
     }
 }

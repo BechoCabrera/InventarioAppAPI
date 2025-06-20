@@ -1,5 +1,6 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
+using InventarioBackend.Infrastructure.Data.Repositories.Billing;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Services;
@@ -76,6 +77,13 @@ namespace InventarioBackend.Core.Application.Billing.Services
         public async Task DeleteAsync(Guid id)
         {
             await _repository.DeleteAsync(id);
+        }
+
+        public async Task<List<InvoiceDto>> GetInvoicesByDateAsync(DateTime date, Guid entitiId)
+        {
+            var invoices = await _repository.GetInvoicesByDateAsync(date, entitiId);
+
+            return invoices.Adapt <List<InvoiceDto>>();
         }
     }
 }
