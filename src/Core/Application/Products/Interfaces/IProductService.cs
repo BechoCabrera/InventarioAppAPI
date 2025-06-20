@@ -14,6 +14,8 @@ namespace InventarioBackend.src.Core.Application.Products.Interfaces
         Task<bool> UpdateAsync(ProductUpdateDto product);
         Task<List<ProductDto>> SearchByNameAsync(string name, Guid entitiId);
         Task<ProductDto?> GetByBarCodeAsync(string barCode, Guid entitiId);
+        Task<ProductDto?> IncreaseStockAsync(Guid productId, int quantity);
+        Task<ProductDto?> DecreaseStockAsync(Guid productId, int quantity);
     }
 
 }

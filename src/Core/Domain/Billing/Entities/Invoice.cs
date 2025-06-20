@@ -8,7 +8,7 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
     {
         public Guid InvoiceId { get; set; } = Guid.NewGuid();
         public string InvoiceNumber { get; set; } = string.Empty;
-        public Guid ClientId { get; set; }
+        public Guid? ClientId { get; set; }
         public DateTime IssueDate { get; set; }
         public DateTime DueDate { get; set; }
         public decimal SubtotalAmount { get; set; }
@@ -19,6 +19,8 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public Guid? EntitiId { get; set; }
+        public string? NameClientDraft { get; set; }
+        public string? NitClientDraft { get; set; }
         // Navegación
         public List<InvoiceDetail> Details { get; set; } = new();
         public Client Client { get; set; } = default!;

@@ -51,6 +51,8 @@ namespace InventarioBackend.Core.Application.Billing.Services
             invoice.DueDate = DateTime.Now;
             invoice.IssueDate = DateTime.Now;
             invoice.CreatedAt = DateTime.Now;
+            invoice.NitClientDraft = invoice.NitClientDraft;
+            invoice.NameClientDraft = invoice.NameClientDraft != null ? invoice.NameClientDraft.ToUpper() : null;
             foreach (var item in invoice.Details)
             {
                 Product? valueProduct = await _productService.GetByIdDomAsync(item.ProductId);

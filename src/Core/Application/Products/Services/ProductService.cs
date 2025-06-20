@@ -73,7 +73,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             existingProduct.Name = product.Name;
             existingProduct.UnitPrice = product.UnitPrice;
             existingProduct.Description = product.Description;
-            existingProduct.Stock = product.Stock + existingProduct.Stock;
+            existingProduct.Stock = existingProduct.Stock;
             existingProduct.CategoryId = product.CategoryId;
             existingProduct.IsActive = product.IsActive;
 
@@ -107,5 +107,38 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             var product = await _productRepository.GetByBarCodeAsync(barCode, entitiId);
             return product?.Adapt<ProductDto>();
         }
+
+        public async Task<ProductDto?> IncreaseStockAsync(Guid productId, int quantity)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                return null;
+            }
+            product.Stock += quantity;
+           
+            await _productRepository.UpdateAsync(product);
+            return product?.Adapt<ProductDto>();
+        }
+
+        public async Task<ProductDto?> DecreaseStockAsync(Guid productId, int quantity)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                return null;
+            }
+            if ((product.Stock - product.StockSold) < quantity)
+            {
+                throw new InvalidOperationException("No hay suficiente stock para reducir.");
+            }
+
+            product.Stock -= quantity;
+
+            await _productRepository.UpdateAsync(product);
+            return product?.Adapt<ProductDto>();
+            
+        }
+
     }
 }

@@ -35,6 +35,7 @@ public class ClientService : IClientService
     public async Task AddAsync(ClientCreateDto dto)
     {
         var client = dto.Adapt<Client>();
+        client.Name = client.Name.ToUpper();
         await _clientRepository.AddAsync(client);
     }
 

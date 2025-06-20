@@ -2,6 +2,7 @@
 using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
+using InventarioBackend.src.Core.Domain.Clients.Entities;
 using Mapster;
 
 namespace InventarioBackend.Core.Application._Common.Mappings
@@ -12,7 +13,7 @@ namespace InventarioBackend.Core.Application._Common.Mappings
         {
             // Mapeo para Invoice con sus detalles
             config.NewConfig<Invoice, InvoiceDto>()
-                .Map(dest => dest.ClientName, src => src.Client.Name)
+                .Map(dest => dest.ClientName, src => src.Client != null ? src.Client.Name : src.NameClientDraft)
                 .Map(dest => dest.EntitiName, src => src.EntitiConfigs.EntitiName); 
             
 

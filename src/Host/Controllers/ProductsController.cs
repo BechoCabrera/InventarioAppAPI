@@ -114,5 +114,59 @@ namespace InventarioBackend.src.Host.Controllers
             return Ok(product);
         }
 
+        [HttpPut("{id}/increaseStock")]
+        public async Task<IActionResult> IncreaseStock(Guid id, [FromBody] int quantity)
+        {
+            if (quantity <= 0)
+            {
+                return BadRequest("La cantidad a aumentar debe ser mayor que 0.");
+            }
+
+            try
+            {
+                var updatedProduct = await _productService.IncreaseStockAsync(id, quantity);
+                if (updatedProduct == null)
+                {
+                    return NotFound("Producto no encontrado.");
+                }
+
+                return Ok(updatedProduct); // Retorna el producto actualizado con el nuevo stock
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);  // Manejo de errores
+            }
+        }
+
+        [HttpPut("{id}/decreaseStock")]
+        public async Task<IActionResult> DecreaseStock(Guid id, [FromBody] int quantity)
+        {
+            if (quantity <= 0)
+            {
+                return BadRequest("La cantidad a reducir debe ser mayor que 0.");
+            }
+
+            try
+            {
+                var updatedProduct = await _productService.DecreaseStockAsync(id, quantity);
+                if (updatedProduct == null)
+                {
+                    return NotFound("Producto no encontrado.");
+                }
+
+                return Ok(updatedProduct); // Retorna el producto actualizado con el nuevo stock
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Devolver un BadRequest con el mensaje de la excepción
+                return BadRequest(ex.Message); // El mensaje de la excepción se enviará al frontend
+            }
+            catch (Exception ex)
+            {
+                // Si ocurre otro tipo de error, devuelve un error 500
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
     }
 }
