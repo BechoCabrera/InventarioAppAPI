@@ -16,7 +16,7 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? PaymentMethod { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public Guid? EntitiId { get; set; }
         // Navegación

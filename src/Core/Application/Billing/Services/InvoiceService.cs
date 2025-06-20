@@ -49,6 +49,8 @@ namespace InventarioBackend.Core.Application.Billing.Services
             var invoice = dto.Adapt<Invoice>();
             invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
             invoice.DueDate = DateTime.Now;
+            invoice.IssueDate = DateTime.Now;
+            invoice.CreatedAt = DateTime.Now;
             foreach (var item in invoice.Details)
             {
                 Product? valueProduct = await _productService.GetByIdDomAsync(item.ProductId);

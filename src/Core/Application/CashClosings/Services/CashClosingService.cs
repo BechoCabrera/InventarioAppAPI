@@ -21,11 +21,12 @@ namespace InventarioBackend.src.Core.Application.CashClosings.Services
         }
 
         // Crear un nuevo cierre de caja
-        public async Task<CashClosingDto> CreateAsync(CashClosingCreateDto cashClosingDto, Guid entitiId, Guid? createdBy)
+        public async Task<CashClosingDto> CreateAsync(CashClosingCreateDto cashClosingDto, Guid? entitiId, Guid? createdBy)
         {
             var cashClosing = cashClosingDto.Adapt<CashClosing>();
             cashClosing.CashClosingId = Guid.NewGuid();
-            cashClosing.CreatedAt = DateTime.UtcNow;
+            cashClosing.CreatedAt = DateTime.Now;
+            cashClosing.Date = DateTime.Now;
             cashClosing.CreatedBy = createdBy; // Asignar el usuario que crea el cierre
             cashClosing.EntitiId = entitiId; // Asignar la entidad
 

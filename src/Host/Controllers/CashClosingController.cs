@@ -21,18 +21,19 @@ namespace InventarioBackend.src.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCashClosing([FromBody] CashClosingCreateDto cashClosingDto, [FromQuery] Guid entitiId)
+        public async Task<IActionResult> CreateCashClosing([FromBody] CashClosingCreateDto cashClosingDto, [FromQuery] Guid userId)
         {
+            Guid? userIdClaim = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
             var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
             if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
             cashClosingDto.EntitiId = Guid.Parse(entitiIdClaim);
 
             
             // Llamar al servicio para crear el cierre de caja
-            var createdCashClosing = await _cashClosingService.CreateAsync(cashClosingDto, entitiId, cashClosingDto.EntitiId);
+            var createdCashClosing = await _cashClosingService.CreateAsync(cashClosingDto, cashClosingDto.EntitiId, userIdClaim);
 
             // Retornar el resultado
-            return CreatedAtAction(nameof(GetCashClosing), new { id = createdCashClosing.CashClosingId, entitiId }, createdCashClosing);
+            return CreatedAtAction(nameof(GetCashClosing), new { id = createdCashClosing.CashClosingId, userId }, createdCashClosing);
         }
 
         [HttpGet]
