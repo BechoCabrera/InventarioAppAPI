@@ -1,6 +1,7 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.Infrastructure.Data.Repositories.Billing;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Services;
@@ -60,7 +61,7 @@ namespace InventarioBackend.Core.Application.Billing.Services
                 {
                     valueProduct.StockSold = item.Quantity + valueProduct.StockSold;
                     await _productService.UpdateAsync(valueProduct);
-                }               
+                }
             }
 
             var savedInvoice = await _repository.AddAsync(invoice);
@@ -87,7 +88,40 @@ namespace InventarioBackend.Core.Application.Billing.Services
         {
             var invoices = await _repository.GetInvoicesByDateAsync(date, entitiId);
 
-            return invoices.Adapt <List<InvoiceDto>>();
+            return invoices.Adapt<List<InvoiceDto>>();
+        }
+
+        public async Task<bool> CancelInvoiceAsync(InvoiceCancellationDto cancellationDto, Guid userId)
+        {
+            try
+            {
+                // Buscar la factura a anular
+                var invoice = await _repository.GetByIdAsync(cancellationDto.InvoiceId);
+                if (invoice == null || invoice.isCancelled)
+                {
+                    return false; // La factura no existe o ya ha sido anulada
+                }
+
+                // Crear un registro de la anulación
+                var cancellation = new CancelledInvoice
+                {
+                    InvoiceId = cancellationDto.InvoiceId,
+                    Reason = cancellationDto.Reason,
+                    CancellationDate = DateTime.Now,
+                    CancelledByUserId = userId
+                };
+
+                // Marcar la factura como anulada
+                invoice.isCancelled = true;
+                await _repository.UpdateAsync(invoice);
+                await _repository.AddCancelledInvoiceAsync(cancellation);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 
 namespace InventarioBackend.src.Core.Application.Billing.Interfaces
 {
@@ -8,6 +9,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Interfaces
         Task<List<InvoiceDto>> GetByEntitiAsync(Guid id);
         Task<InvoiceDto?> GetByIdAsync(Guid id);
         Task<InvoiceDto> AddAsync(InvoiceCreateDto dto);
+        Task<bool> CancelInvoiceAsync(InvoiceCancellationDto dto, Guid userId);
         Task UpdateAsync(Guid id, InvoiceCreateDto dto);
         Task DeleteAsync(Guid id);
         Task<List<InvoiceDto>> GetInvoicesByDateAsync(DateTime date, Guid entitiId);

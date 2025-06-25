@@ -49,6 +49,12 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(ProductCreateDto dto)
         {
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if(role == "vaneaf")
+            {
+                return NotFound("Usted no tiene acceso a esta funcion.");
+            }
+
             var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
             if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
             dto.EntitiId = Guid.Parse(entitiIdClaim);
@@ -117,6 +123,11 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpPut("{id}/increaseStock")]
         public async Task<IActionResult> IncreaseStock(Guid id, [FromBody] int quantity)
         {
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (role == "vaneaf")
+            {
+                return NotFound("Usted no tiene acceso a esta funcion.");
+            }
             if (quantity <= 0)
             {
                 return BadRequest("La cantidad a aumentar debe ser mayor que 0.");
@@ -141,6 +152,11 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpPut("{id}/decreaseStock")]
         public async Task<IActionResult> DecreaseStock(Guid id, [FromBody] int quantity)
         {
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (role == "vaneaf")
+            {
+                return NotFound("Usted no tiene acceso a esta funcion.");
+            }
             if (quantity <= 0)
             {
                 return BadRequest("La cantidad a reducir debe ser mayor que 0.");
@@ -167,6 +183,5 @@ namespace InventarioBackend.src.Host.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
     }
 }

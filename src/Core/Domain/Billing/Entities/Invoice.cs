@@ -21,6 +21,8 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
         public Guid? EntitiId { get; set; }
         public string? NameClientDraft { get; set; }
         public string? NitClientDraft { get; set; }
+
+        public bool isCancelled { get; set; }
         // Navegación
         public List<InvoiceDetail> Details { get; set; } = new();
         public Client Client { get; set; } = default!;

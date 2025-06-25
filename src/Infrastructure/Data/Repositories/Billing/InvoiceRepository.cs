@@ -13,6 +13,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
     {
         private readonly AppDbContext _context;
         private readonly DbSet<Invoice> _dbSet;
+        private readonly DbSet<CancelledInvoice> _dbSetCancelledInvoice;
 
         public InvoiceRepository(AppDbContext context)
         {
@@ -52,6 +53,19 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 await _dbSet.AddAsync(invoice);
                 await _context.SaveChangesAsync();
                 await _context.Entry(invoice).Reference(i => i.Client).LoadAsync();
+                return invoice;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        } 
+        public async Task<CancelledInvoice> AddCancelledInvoiceAsync(CancelledInvoice invoice)
+        {
+            try
+            {
+                await _dbSetCancelledInvoice.AddAsync(invoice);
+                await _context.SaveChangesAsync();
                 return invoice;
             }
             catch (Exception ex)

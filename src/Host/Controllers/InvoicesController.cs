@@ -4,6 +4,9 @@ using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using System.Security.Claims;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
+using InventarioBackend.src.Core.Application.Billing.Services;
+using InventarioBackend.src.Core.Domain.Security.Entities;
 
 namespace InventarioBackend.Host.Controllers
 {
@@ -90,6 +93,23 @@ namespace InventarioBackend.Host.Controllers
 
             var invoices = await _invoiceService.GetInvoicesByDateAsync(date, entitiId);
             return Ok(invoices);
+        }
+
+        [HttpPost("cancel")]
+        public async Task<IActionResult> CancelInvoice([FromBody] InvoiceCancellationDto cancellationDto)
+        {
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            Guid userId = Guid.Parse(userIdString);
+            var result = await _invoiceService.CancelInvoiceAsync(cancellationDto, userId);
+
+            if (result)
+            {
+                return Ok(new { message = "Factura anulada correctamente" });
+            }
+            else
+            {
+                return BadRequest(new { message = "Error al anular la factura. Verifique el estado de la factura." });
+            }
         }
     }
 }
