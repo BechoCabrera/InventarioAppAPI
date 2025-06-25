@@ -1,15 +1,11 @@
-﻿using InventarioBackend.Core.Application.Billing.DTOs;
-using InventarioBackend.Core.Domain.Billing;
-using InventarioBackend.src.Core.Domain.Billing.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using InventarioBackend.src.Core.Domain.Billing.Entities;
 
 namespace InventarioBackend.Core.Domain.Billing.Interfaces
 {
     public interface IInvoiceRepository
     {
         Task<List<Invoice>> GetAllAsync();
+        Task<List<Invoice>> GetInvoicesByNumberAsync(string number);
         Task<List<Invoice>> GetByEntitiAsync(Guid id);
         Task<Invoice?> GetByIdAsync(Guid id);
         Task<Invoice> AddAsync(Invoice invoice);

@@ -9,9 +9,11 @@ using InventarioBackend.src.Core.Application.Settings.Services;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace InventarioBackend.Core.Application.Billing.Services
 {
@@ -47,6 +49,7 @@ namespace InventarioBackend.Core.Application.Billing.Services
 
         public async Task<InvoiceDto> AddAsync(InvoiceCreateDto dto)
         {
+            return dto.Adapt<InvoiceDto>();
             var invoice = dto.Adapt<Invoice>();
             invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
             invoice.DueDate = DateTime.Now;
@@ -99,22 +102,22 @@ namespace InventarioBackend.Core.Application.Billing.Services
                 var invoice = await _repository.GetByIdAsync(cancellationDto.InvoiceId);
                 if (invoice == null || invoice.isCancelled)
                 {
-                    return false; // La factura no existe o ya ha sido anulada
+                    //return false; // La factura no existe o ya ha sido anulada
                 }
 
                 // Crear un registro de la anulación
-                var cancellation = new CancelledInvoice
+                CancelledInvoice cancellation = new CancelledInvoice
                 {
                     InvoiceId = cancellationDto.InvoiceId,
                     Reason = cancellationDto.Reason,
                     CancellationDate = DateTime.Now,
-                    CancelledByUserId = userId
+                    CancelledByUserId = userId,
                 };
 
                 // Marcar la factura como anulada
-                invoice.isCancelled = true;
-                await _repository.UpdateAsync(invoice);
+                invoice.isCancelled = true;                
                 await _repository.AddCancelledInvoiceAsync(cancellation);
+                await _repository.UpdateAsync(invoice);
 
                 return true;
             }
@@ -122,6 +125,12 @@ namespace InventarioBackend.Core.Application.Billing.Services
             {
                 return false;
             }
+        }
+
+        public async Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string number)
+        {
+            var result = await _repository.GetInvoicesByNumberAsync(number);
+            return result.Adapt<List<InvoiceDto>>();
         }
     }
 }

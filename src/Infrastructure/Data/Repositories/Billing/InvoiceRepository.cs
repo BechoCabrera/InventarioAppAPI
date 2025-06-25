@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
 {
@@ -19,6 +20,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         {
             _context = context;
             _dbSet = context.Set<Invoice>();
+            _dbSetCancelledInvoice = context.Set<CancelledInvoice>();
         }
 
         public async Task<List<Invoice>> GetAllAsync()
@@ -27,14 +29,14 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 .Include(i => i.Client)
                 .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)
                 .ToListAsync();
-        } 
-        
+        }
+
         public async Task<List<Invoice>> GetByEntitiAsync(Guid id)
         {
-            return await _dbSet.Where(a=>a.EntitiId == id)
+            return await _dbSet.Where(a => a.EntitiId == id)
                 .Include(i => i.Client)
                 .Include(i => i.EntitiConfigs)
-                .Include(i => i.Details).ThenInclude(d => d.Product).OrderByDescending(a=>a.DueDate)
+                .Include(i => i.Details).ThenInclude(d => d.Product).OrderByDescending(a => a.DueDate)
                 .ToListAsync();
         }
 
@@ -59,7 +61,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             {
                 throw new Exception(ex.Message);
             }
-        } 
+        }
         public async Task<CancelledInvoice> AddCancelledInvoiceAsync(CancelledInvoice invoice)
         {
             try
@@ -95,6 +97,15 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             return await _context.Invoices
                 .Where(invoice => invoice.CreatedAt.Date == date.Date && invoice.EntitiId == entitiId)
                 .ToListAsync();
+        }
+
+        public async Task<List<Invoice>> GetInvoicesByNumberAsync(string number)
+        {
+            return await _context.Invoices
+                         .Where(i => i.InvoiceNumber.StartsWith(number))
+                         .Include(i => i.Client)
+                         .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)// Filtra por el prefijo del número de factura
+                         .ToListAsync();
         }
     }
 }

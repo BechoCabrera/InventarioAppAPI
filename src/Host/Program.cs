@@ -7,6 +7,7 @@ using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.Infrastructure.Data.Repositories.Billing;
 using InventarioBackend.Infrastructure.Data.Repositories.Clients;
 using InventarioBackend.src.Core.Application._Common.Mappings;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.CashClosings.Interfaces;
 using InventarioBackend.src.Core.Application.CashClosings.Services;
@@ -102,6 +103,8 @@ builder.Services.AddScoped<ConsecutiveSettingsService>();
 builder.Services.AddScoped<IEntitiConfigRepository, EntitiConfigRepository>();
 builder.Services.AddScoped<IEntitiConfigService, EntitiConfigService>();
 builder.Services.AddScoped<ICashClosingService, CashClosingService>();
+builder.Services.AddScoped<ICashClosingRepository, CashClosingRepository>();
+builder.Services.AddScoped<IInvoiceCancellationService, >();
 builder.Services.AddScoped<ICashClosingRepository, CashClosingRepository>();
 
 //Mapping

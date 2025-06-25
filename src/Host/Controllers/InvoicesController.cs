@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using InventarioBackend.Core.Application.Billing.DTOs;
-using InventarioBackend.src.Core.Application.Billing.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using InventarioBackend.src.Core.Application.Products.DTOs;
-using System.Security.Claims;
+﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.DTOs;
+using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.Billing.Services;
+using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Domain.Security.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace InventarioBackend.Host.Controllers
 {
@@ -110,6 +111,20 @@ namespace InventarioBackend.Host.Controllers
             {
                 return BadRequest(new { message = "Error al anular la factura. Verifique el estado de la factura." });
             }
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<InvoiceDto>>> SearchInvoice([FromQuery] string number)
+        {
+            if (string.IsNullOrWhiteSpace(number))
+            {
+                return BadRequest("El número de factura no puede estar vacío.");
+            }
+
+            // Usa el servicio para obtener las facturas
+            var invoices = await _invoiceService.GetInvoicesByNumberAsync(number);
+
+            return Ok(invoices);
         }
     }
 }

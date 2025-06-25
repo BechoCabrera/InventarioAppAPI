@@ -32,6 +32,7 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
         public DbSet<EntitiConfig> EntitiConfigs { get; set; }
         public DbSet<CashClosing> CashClosings { get; set; }
+        public DbSet<CancelledInvoice> CancelledInvoice { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission
