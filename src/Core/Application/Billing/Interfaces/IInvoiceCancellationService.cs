@@ -4,6 +4,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Interfaces
 {
     public interface IInvoiceCancellationService
     {
-        Task<bool> CancelInvoiceAsync(InvoiceCancellationDto cancellationDto, Guid userId);
+        Task<bool> AddInvoicesCancelledAsync(InvoiceCancellationDto cancellationDto, Guid userId);
+        Task<List<InvoiceCancellationDto>> GetAllAsync();
     }
 }

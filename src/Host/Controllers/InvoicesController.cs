@@ -96,23 +96,6 @@ namespace InventarioBackend.Host.Controllers
             return Ok(invoices);
         }
 
-        [HttpPost("cancel")]
-        public async Task<IActionResult> CancelInvoice([FromBody] InvoiceCancellationDto cancellationDto)
-        {
-            var userIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            Guid userId = Guid.Parse(userIdString);
-            var result = await _invoiceService.CancelInvoiceAsync(cancellationDto, userId);
-
-            if (result)
-            {
-                return Ok(new { message = "Factura anulada correctamente" });
-            }
-            else
-            {
-                return BadRequest(new { message = "Error al anular la factura. Verifique el estado de la factura." });
-            }
-        }
-
         [HttpGet("search")]
         public async Task<ActionResult<List<InvoiceDto>>> SearchInvoice([FromQuery] string number)
         {

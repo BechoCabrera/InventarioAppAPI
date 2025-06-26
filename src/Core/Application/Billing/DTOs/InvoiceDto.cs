@@ -21,6 +21,7 @@ namespace InventarioBackend.Core.Application.Billing.DTOs
         public string? NameClientDraft { get; set; }
         public string? NitClientDraft { get; set; }
         public Guid? EntitiId { get; set; }
+        public bool isCancelled { get; set; }
         public List<InvoiceDetailDto> Details { get; set; } = new();
     }
 }

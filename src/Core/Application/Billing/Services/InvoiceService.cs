@@ -49,7 +49,6 @@ namespace InventarioBackend.Core.Application.Billing.Services
 
         public async Task<InvoiceDto> AddAsync(InvoiceCreateDto dto)
         {
-            return dto.Adapt<InvoiceDto>();
             var invoice = dto.Adapt<Invoice>();
             invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
             invoice.DueDate = DateTime.Now;
@@ -93,40 +92,6 @@ namespace InventarioBackend.Core.Application.Billing.Services
 
             return invoices.Adapt<List<InvoiceDto>>();
         }
-
-        public async Task<bool> CancelInvoiceAsync(InvoiceCancellationDto cancellationDto, Guid userId)
-        {
-            try
-            {
-                // Buscar la factura a anular
-                var invoice = await _repository.GetByIdAsync(cancellationDto.InvoiceId);
-                if (invoice == null || invoice.isCancelled)
-                {
-                    //return false; // La factura no existe o ya ha sido anulada
-                }
-
-                // Crear un registro de la anulación
-                CancelledInvoice cancellation = new CancelledInvoice
-                {
-                    InvoiceId = cancellationDto.InvoiceId,
-                    Reason = cancellationDto.Reason,
-                    CancellationDate = DateTime.Now,
-                    CancelledByUserId = userId,
-                };
-
-                // Marcar la factura como anulada
-                invoice.isCancelled = true;                
-                await _repository.AddCancelledInvoiceAsync(cancellation);
-                await _repository.UpdateAsync(invoice);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
         public async Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string number)
         {
             var result = await _repository.GetInvoicesByNumberAsync(number);

@@ -32,7 +32,8 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
         public DbSet<EntitiConfig> EntitiConfigs { get; set; }
         public DbSet<CashClosing> CashClosings { get; set; }
-        public DbSet<CancelledInvoice> CancelledInvoice { get; set; }
+        public DbSet<InvoicesCancelled> InvoicesCancelled { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // UserPermission
@@ -152,7 +153,11 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(c => c.EntitiId);
 
-
+            modelBuilder.Entity<InvoicesCancelled>(entity =>
+            {
+                entity.HasKey(e => e.InvoiceCancelledId);  // Define la clave primaria
+                entity.Property(e => e.Reason).IsRequired().HasMaxLength(500); // Ejemplo de validación en propiedades
+            });
             modelBuilder.ApplyConfiguration(new ProductConfig());
 
             // Aquí puedes agregar configuraciones adicionales de entidades, índices, etc.
