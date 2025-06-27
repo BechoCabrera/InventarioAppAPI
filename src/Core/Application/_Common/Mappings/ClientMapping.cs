@@ -2,7 +2,7 @@
 using InventarioBackend.src.Core.Domain.Clients.Entities;
 using Mapster;
 
-namespace InventarioBackend.Core.Application._Common.Mappings
+namespace InventarioBackend.src.Core.Application._Common.Mappings
 {
     public class ClientMapping : IRegister
     {

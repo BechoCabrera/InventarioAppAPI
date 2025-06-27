@@ -4,7 +4,7 @@ using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.Clients.Interfaces;
 using Mapster;
 
-namespace InventarioBackend.Core.Application.Clients.Services;
+namespace InventarioBackend.src.Core.Application.Clients.Services;
 
 public class ClientService : IClientService
 {

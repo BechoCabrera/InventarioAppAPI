@@ -1,8 +1,5 @@
 ﻿using Infrastructure.Data.Repositories.Products;
 using InventarioBackend.Core.Application._Common.Mappings;
-using InventarioBackend.Core.Application.Billing.Services;
-using InventarioBackend.Core.Application.Clients.Services;
-using InventarioBackend.Core.Application.Menu.Services;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.Infrastructure.Data.Repositories.Billing;
 using InventarioBackend.Infrastructure.Data.Repositories.Clients;
@@ -12,9 +9,11 @@ using InventarioBackend.src.Core.Application.Billing.Services;
 using InventarioBackend.src.Core.Application.CashClosings.Interfaces;
 using InventarioBackend.src.Core.Application.CashClosings.Services;
 using InventarioBackend.src.Core.Application.Clients.Interfaces;
+using InventarioBackend.src.Core.Application.Clients.Services;
 using InventarioBackend.src.Core.Application.EntitiConfigs.Interfaces;
 using InventarioBackend.src.Core.Application.EntitiConfigs.Services;
 using InventarioBackend.src.Core.Application.Menu.Interfaces;
+using InventarioBackend.src.Core.Application.Menu.Services;
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Application.Products.Services;
 using InventarioBackend.src.Core.Application.Security.Interfaces;
@@ -109,7 +108,7 @@ builder.Services.AddScoped<IEntitiConfigService, EntitiConfigService>();
 builder.Services.AddScoped<ICashClosingService, CashClosingService>();
 builder.Services.AddScoped<ICashClosingRepository, CashClosingRepository>();
 builder.Services.AddScoped<IInvoiceCancellationRepository, InvoiceCancellationRepository>();
-//builder.Services.AddScoped<IInvoiceCancellationService, InvoiceCancellationService>();
+builder.Services.AddScoped<IInvoiceCancellationService, InvoiceCancellationService>();
 
 
 

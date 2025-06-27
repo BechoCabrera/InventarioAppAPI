@@ -3,12 +3,8 @@ using InventarioBackend.src.Core.Application.Menu.DTOs;
 using InventarioBackend.src.Core.Application.Menu.Interfaces;
 using InventarioBackend.src.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace InventarioBackend.Core.Application.Menu.Services
+namespace InventarioBackend.src.Core.Application.Menu.Services
 {
     public class MenuService : IMenuService
     {

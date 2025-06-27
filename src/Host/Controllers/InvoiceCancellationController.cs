@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using InventarioBackend.src.Core.Application.Billing.Services;
 using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using InventarioBackend.Core.Application.Billing.DTOs;
-using InventarioBackend.Core.Application.Billing.Services;
 
 namespace InventarioBackend.src.Host.Controllers
 {
@@ -14,9 +11,7 @@ namespace InventarioBackend.src.Host.Controllers
     [Authorize]
     public class InvoiceCancellationController : ControllerBase
     {
-        private readonly IInvoiceCancellationService _invoiceCancellationService;
-
-        // Inyección de la interfaz IInvoiceCancellationService
+        private readonly IInvoiceCancellationService _invoiceCancellationService;        
         public InvoiceCancellationController(IInvoiceCancellationService invoiceCancellationService)
         {
             _invoiceCancellationService = invoiceCancellationService;
@@ -25,7 +20,11 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpPost]
         public async Task<IActionResult> CancelInvoice([FromBody] InvoiceCancellationDto cancellationDto)
         {
-            // Obtener el UserId desde los claims
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (role == "vaneaf")
+            {
+                return NotFound("Usted no tiene acceso a esta funcion.");
+            }
             var userIdString = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString))
             {
@@ -33,11 +32,11 @@ namespace InventarioBackend.src.Host.Controllers
             }
 
             Guid userId = Guid.Parse(userIdString);
-
-            // Llamar al servicio de anulación
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;            
+            cancellationDto.EntitiConfigId = Guid.Parse(entitiIdClaim);
+            
             var result = await _invoiceCancellationService.AddInvoicesCancelledAsync(cancellationDto, userId);
-
-            // Verificar si la factura fue anulada correctamente
+           
             if (result)
             {
                 return Ok(new { message = "Factura anulada correctamente" });
@@ -52,19 +51,15 @@ namespace InventarioBackend.src.Host.Controllers
         public async Task<ActionResult<List<InvoiceCancellationDto>>> GetAll()
         {
             var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
-            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (role == "ADMIN")
-            {
-                return Ok(await _invoiceCancellationService.GetAllAsync());
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
 
-                var entitiId = Guid.Parse(entitiIdClaim);
-                List<InvoiceCancellationDto> data = await _invoiceCancellationService.GetAllAsync();
-                return Ok(data);
+            if (string.IsNullOrEmpty(entitiIdClaim))
+            {
+                return Unauthorized(new { message = "El ID de la entidad no está disponible." });
             }
+
+            var entitiId = Guid.Parse(entitiIdClaim);
+            List<InvoiceCancellationDto> data = await _invoiceCancellationService.GetAllAsync(entitiId); // Usar el filtro aquí
+            return Ok(data);
         }
     }
 }

@@ -36,10 +36,10 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Billing
             }
         }
 
-        public async Task<List<InvoicesCancelled>> GetAllAsync()
+        public async Task<List<InvoicesCancelled>> GetAllAsync(Guid entitiId)
         {
-            return await _dbSetCancelledInvoice
-                .Include(i => i.CancelledByUser)
+            return await _dbSetCancelledInvoice.Where(a=>a.EntitiConfigId == entitiId)
+                .Include(i => i.User).Include(i => i.Invoice)
                 .Include(i => i.EntitiConfigs)
                 .ToListAsync();
         }

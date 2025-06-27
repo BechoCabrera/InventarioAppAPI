@@ -1,4 +1,4 @@
-﻿using InventarioBackend.Core.Application.Clients.Services;
+﻿using InventarioBackend.src.Core.Application.Clients.Services;
 using InventarioBackend.src.Core.Application.Clients.DTOs;
 using InventarioBackend.src.Core.Application.Clients.Interfaces;
 using Microsoft.AspNetCore.Authorization;

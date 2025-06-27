@@ -1,6 +1,7 @@
 ﻿using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
+using InventarioBackend.src.Core.Domain.Security.Entities;
 
 namespace InventarioBackend.src.Core.Domain.Billing.Entities
 {
@@ -24,8 +25,11 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
 
         public bool isCancelled { get; set; }
         // Navegación
-        public List<InvoiceDetail> Details { get; set; } = new();
-        public Client Client { get; set; } = default!;
+        public List<InvoiceDetail?> Details { get; set; } = new();
+        public Client? Client { get; set; } = default!;
         public EntitiConfig? EntitiConfigs { get; set; } = default!;
+        public InvoicesCancelled? InvoicesCancelled { get; set; } = default!;
+       
+
     }
 }

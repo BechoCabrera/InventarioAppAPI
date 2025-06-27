@@ -88,6 +88,7 @@
     "facturacion": "Facturación",
     "facturacion.crear-factura": "Crear factura",
     "facturacion.historial-facturas": "Historial de facturas",
+    "facturacion.cancelacion-factura": "Anular factura",
     "entiti-config": "Configuración de Entidad",
     "entiti-config.entiti-config.crear": "Crear entidad",
     "entiti-config.entiti-config.editar": "Editar entidad"

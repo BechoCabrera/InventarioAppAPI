@@ -1,21 +1,13 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
-using InventarioBackend.Infrastructure.Data.Repositories.Billing;
-using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
-using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Application.Products.Services;
 using InventarioBackend.src.Core.Application.Settings.Services;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace InventarioBackend.Core.Application.Billing.Services
+namespace InventarioBackend.src.Core.Application.Billing.Services
 {
     public class InvoiceService : IInvoiceService
     {
@@ -37,7 +29,7 @@ namespace InventarioBackend.Core.Application.Billing.Services
         }
         public async Task<List<InvoiceDto>> GetByEntitiAsync(Guid id)
         {
-            var invoices = await _repository.GetByEntitiAsync(id);
+            List<Invoice> invoices = await _repository.GetByEntitiAsync(id);
             return invoices.Adapt<List<InvoiceDto>>();
         }
 
@@ -73,12 +65,20 @@ namespace InventarioBackend.Core.Application.Billing.Services
 
         public async Task UpdateAsync(Guid id, InvoiceCreateDto dto)
         {
-            var invoice = await _repository.GetByIdAsync(id);
-            if (invoice == null) return;
+            try
+            {
+                var invoice = await _repository.GetByIdAsync(id);
+                if (invoice == null) return;
 
-            dto.Adapt(invoice);
-            invoice.UpdatedAt = DateTime.UtcNow;
-            await _repository.UpdateAsync(invoice);
+                dto.Adapt(invoice);
+                invoice.UpdatedAt = DateTime.UtcNow;
+                await _repository.UpdateAsync(invoice);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
 
         public async Task DeleteAsync(Guid id)

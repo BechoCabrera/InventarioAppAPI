@@ -155,9 +155,27 @@ namespace InventarioBackend.src.Infrastructure.Data
 
             modelBuilder.Entity<InvoicesCancelled>(entity =>
             {
-                entity.HasKey(e => e.InvoiceCancelledId);  // Define la clave primaria
+                entity.HasKey(e => e.InvoiceCancellationId);  // Define la clave primaria
                 entity.Property(e => e.Reason).IsRequired().HasMaxLength(500); // Ejemplo de validación en propiedades
             });
+
+            modelBuilder.Entity<InvoicesCancelled>()
+                .HasOne(d => d.Invoice)
+                .WithOne(p => p.InvoicesCancelled)
+                .HasForeignKey<InvoicesCancelled>(d => d.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InvoicesCancelled>()
+                .HasOne(d => d.User)
+                .WithMany()  // Un usuario puede tener muchas anulaciones de factura
+                .HasForeignKey(d => d.CancelledByUserId);
+
+            // Configuración de la relación entre InvoicesCancelled y EntitiConfig
+            modelBuilder.Entity<InvoicesCancelled>()
+                .HasOne(d => d.EntitiConfigs)
+                .WithMany()  // Una entidad de configuración puede tener muchas anulaciones de factura
+                .HasForeignKey(d => d.EntitiConfigId);
+
             modelBuilder.ApplyConfiguration(new ProductConfig());
 
             // Aquí puedes agregar configuraciones adicionales de entidades, índices, etc.

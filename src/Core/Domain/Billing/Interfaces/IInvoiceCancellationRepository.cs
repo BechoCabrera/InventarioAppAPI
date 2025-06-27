@@ -5,6 +5,6 @@ namespace InventarioBackend.src.Core.Domain.Billing.Interfaces
     public interface IInvoiceCancellationRepository
     {
         Task<InvoicesCancelled> AddInvoicesCancelledAsync(InvoicesCancelled cancellationDto);
-        Task<List<InvoicesCancelled>> GetAllAsync();
+        Task<List<InvoicesCancelled>> GetAllAsync(Guid entitiId);
     }
 }
