@@ -115,6 +115,7 @@ builder.Services.AddScoped<IInvoiceCancellationService, InvoiceCancellationServi
 //Mapping
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ProductMapping).Assembly);
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ClientMapping).Assembly);
+TypeAdapterConfig.GlobalSettings.Scan(typeof(CashClosingMapping).Assembly);
 TypeAdapterConfig.GlobalSettings.Scan(typeof(InvoiceMapping).Assembly);
 TypeAdapterConfig.GlobalSettings.Scan(typeof(ConsecutiveSettingsMapping).Assembly);
 TypeAdapterConfig.GlobalSettings.Scan(typeof(EntitiConfigMapping).Assembly);

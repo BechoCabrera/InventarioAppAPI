@@ -39,6 +39,12 @@ namespace InventarioBackend.src.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCashClosings([FromQuery] Guid entitiId)
         {
+            Guid? userIdClaim = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+            entitiId = Guid.Parse(entitiIdClaim);
+
             var cashClosings = await _cashClosingService.GetAllAsync(entitiId);
             return Ok(cashClosings);
         }

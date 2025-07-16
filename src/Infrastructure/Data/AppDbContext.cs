@@ -142,6 +142,17 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(c => c.EntitiId);
 
+            modelBuilder.Entity<CashClosing>()
+                .HasOne(c => c.EntitiConfigs)
+                .WithMany()
+                .HasForeignKey(c => c.EntitiId);
+
+            modelBuilder.Entity<CashClosing>()
+               .HasOne(d => d.User)
+               .WithMany()  // Un usuario puede tener muchas anulaciones de factura
+               .HasForeignKey(d => d.CreatedBy);
+
+
             modelBuilder.Entity<InvoiceDetail>()
                 .HasOne(d => d.Product)
                 .WithMany(p => p.InvoiceDetails)
@@ -170,6 +181,7 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .WithMany()  // Un usuario puede tener muchas anulaciones de factura
                 .HasForeignKey(d => d.CancelledByUserId);
 
+           
             // Configuración de la relación entre InvoicesCancelled y EntitiConfig
             modelBuilder.Entity<InvoicesCancelled>()
                 .HasOne(d => d.EntitiConfigs)

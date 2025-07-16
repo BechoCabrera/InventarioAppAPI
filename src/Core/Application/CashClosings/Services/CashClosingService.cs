@@ -41,11 +41,22 @@ namespace InventarioBackend.src.Core.Application.CashClosings.Services
         // Obtener todos los cierres de caja filtrados por EntitiId
         public async Task<IEnumerable<CashClosingDto>> GetAllAsync(Guid entitiId)
         {
-            var cashClosings = await _context.CashClosings
-                                             .Where(c => c.EntitiId == entitiId) // Filtrar por entidad
-                                             .ToListAsync();
+                var cashClosings = await _context.CashClosings
+                    .Include(a => a.EntitiConfigs)
+                    .Include(a => a.User)
+                    .Where(c => c.EntitiId == entitiId)
+                    .ToListAsync();
 
-            return cashClosings.Adapt<IEnumerable<CashClosingDto>>();
+            // Agrupar por fecha (solo por día, ignorando la hora)
+            var latestCashClosings = cashClosings
+                .GroupBy(c => c.Date.Date)  // Agrupar por fecha (sin la hora)
+                .Select(group => group
+                    .OrderByDescending(c => c.Date)  // Ordenar por fecha de cierre de caja, para obtener el más reciente
+                    .FirstOrDefault())  // Tomar el primer elemento de cada grupo (el más reciente)
+                .ToList();
+
+            // Convertir a DTO
+            return latestCashClosings.Adapt<IEnumerable<CashClosingDto>>();
         }
 
         // Obtener un cierre de caja por ID y EntitiId

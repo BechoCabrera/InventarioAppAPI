@@ -12,5 +12,9 @@
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid? EntitiId { get; set; }
+        public string? EntitiName { get; set; }
+        public string? UserName { get; set; }
+        
+        
     }
 }
