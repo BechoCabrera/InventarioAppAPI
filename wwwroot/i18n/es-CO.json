@@ -92,8 +92,8 @@
     "entiti-config": "Configuración de Entidad",
     "entiti-config.entiti-config.crear": "Crear entidad",
     "entiti-config.entiti-config.editar": "Editar entidad",
-    "Caja": "Caja",
-    "Caja.Cierre de Caja": "Cierre de caja"
+    "caja": "Caja",
+    "caja.cierre-caja": "Cierre de caja"
   },
     "validation": {
         "required": "Este campo es obligatorio",
