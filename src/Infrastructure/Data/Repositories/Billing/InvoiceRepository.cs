@@ -79,7 +79,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         public async Task<List<Invoice>> GetInvoicesByDateAsync(DateTime date, Guid entitiId)
         {
             return await _context.Invoices
-                .Where(invoice => invoice.CreatedAt.Date == date.Date && invoice.EntitiId == entitiId && invoice.isCancelled == false)
+                .Where(invoice => invoice.CreatedAt.Date == date.Date && invoice.EntitiId == entitiId)
                 .ToListAsync();
         }
 
