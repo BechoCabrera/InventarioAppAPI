@@ -41,8 +41,8 @@ TestResults/
 #################################
 # 💾 Configuración local
 #################################
+appsettings.json
 appsettings.*.json
-!appsettings.json
 
 #################################
 # 🌐 Web output (Blazor, Angular)
