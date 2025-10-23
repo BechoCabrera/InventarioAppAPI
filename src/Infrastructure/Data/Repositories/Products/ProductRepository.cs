@@ -66,13 +66,13 @@ public class ProductRepository : IProductRepository
     {
 
         return await _context.Products.Include(p => p.EntitiConfigs)
-            .Where(p => p.Name.Contains(name) && p.EntitiId == entitiId)
+            .Where(p => p.Name.Contains(name) && p.EntitiId == entitiId && p.IsActive)
             .ToListAsync();
     }
 
     public async Task<Product?> GetByBarCodeAsync(string barCode, Guid entitiId)
     {
         return await _context.Products.Include(p => p.EntitiConfigs)
-            .FirstOrDefaultAsync(p => p.BarCode == barCode && p.EntitiId == entitiId);
+            .FirstOrDefaultAsync(p => p.BarCode == barCode && p.EntitiId == entitiId && p.IsActive);
     }
 }

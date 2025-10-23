@@ -5,6 +5,7 @@ using InventarioBackend.src.Core.Application.Billing.Services;
 using InventarioBackend.src.Core.Application.Products.DTOs;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -59,7 +60,7 @@ namespace InventarioBackend.Host.Controllers
             if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
 
             dto.EntitiId = Guid.Parse(entitiIdClaim);
-            
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -109,5 +110,22 @@ namespace InventarioBackend.Host.Controllers
 
             return Ok(invoices);
         }
+
+
+        [HttpPost("filter")]
+        public async Task<ActionResult<List<InvoiceDto>>> SearchFilter([FromBody] SearchInvoiceRequest request)
+        {
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim))
+                return Unauthorized();
+
+            Guid entitiId = Guid.Parse(entitiIdClaim);
+
+            var invoice = await _invoiceService.GetInvoicesByFiltersAsync(request, entitiId);
+            return Ok(invoice);
+        }
+
+
     }
 }
+

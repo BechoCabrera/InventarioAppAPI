@@ -10,6 +10,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Interfaces
         Task<InvoiceDto?> GetByIdAsync(Guid id);
         Task<InvoiceDto> AddAsync(InvoiceCreateDto dto);
         Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string voiceId);
+        Task<List<InvoiceDto>> GetInvoicesByFiltersAsync(SearchInvoiceRequest req, Guid entitiId);
         Task UpdateAsync(Guid id, InvoiceCreateDto dto);
         Task DeleteAsync(Guid id);
         Task<List<InvoiceDto>> GetInvoicesByDateAsync(DateTime date, Guid entitiId);

@@ -90,6 +90,11 @@ namespace InventarioBackend.src.Host.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (role == "vaneaf")
+            {
+                return NotFound("Usted no tiene acceso a esta funcion.");
+            }
             var success = await _productService.DeleteAsync(id);
             return Ok(new { message = $"{success}" });
         }

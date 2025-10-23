@@ -1,6 +1,7 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -30,11 +31,19 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
 
         public async Task<List<Invoice>> GetByEntitiAsync(Guid id)
         {
-            return await _dbSet.Where(a => a.EntitiId == id)
-                .Include(i => i.Client)
-                .Include(i => i.EntitiConfigs)
-                .Include(i => i.Details).ThenInclude(d => d.Product).OrderByDescending(a => a.DueDate)
-                .ToListAsync();
+            try
+            {
+                return await _dbSet.Where(a => a.EntitiId == id)
+               //.Include(i => i.Client).AsSingleQuery()
+               //.Include(i => i.EntitiConfigs).AsSingleQuery()
+               //.Include(i => i.Details).ThenInclude(d => d.Product).AsSingleQuery().OrderByDescending(a => a.DueDate)
+               .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task<Invoice?> GetByIdAsync(Guid id)
@@ -86,10 +95,47 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         public async Task<List<Invoice>> GetInvoicesByNumberAsync(string number)
         {
             return await _context.Invoices
-                         .Where(i => i.InvoiceNumber.StartsWith(number))
+                         .Where(i => i.InvoiceNumber.StartsWith(number) && i.isCancelled == false)
                          .Include(i => i.Client)
                          .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)// Filtra por el prefijo del número de factura
                          .ToListAsync();
+        }
+        public async Task<List<Invoice>> GetInvoicesByFiltersAsync(SearchInvoiceRequest data, Guid entitiId)
+        {            
+            IQueryable<Invoice> query = _context.Invoices
+                .Where(i => i.EntitiId == entitiId)
+                .AsNoTracking() // <- Mejora rendimiento (solo lectura)
+                .Include(i => i.Client)
+                .Include(i => i.Details).ThenInclude(d => d.Product)
+                .Include(i => i.EntitiConfigs);
+
+            if (!string.IsNullOrWhiteSpace(data.InvoiceNumber))
+                query = query.Where(i => i.InvoiceNumber.StartsWith(data.InvoiceNumber));
+
+            if (data.StartDate.HasValue && data.EndDate.HasValue)
+            {
+                var start = data.StartDate.Value.Date;
+                var end = data.EndDate.Value.Date.AddDays(1).AddTicks(-1); // incluye todo el último día
+
+                query = query.Where(i =>
+                    i.IssueDate.Date >= start &&
+                    i.IssueDate.Date <= end);
+            }
+            else if (data.StartDate.HasValue)
+                query = query.Where(i => i.IssueDate >= data.StartDate.Value);
+            else if (data.EndDate.HasValue)
+                query = query.Where(i => i.IssueDate <= data.EndDate.Value);
+           
+            if (!string.IsNullOrWhiteSpace(data.PaymentMethod))
+                query = query.Where(i => i.PaymentMethod != null &&
+                                         EF.Functions.Like(i.PaymentMethod.ToLower(), data.PaymentMethod.ToLower()));
+
+            if (data.IsCancelled.HasValue)
+                query = query.Where(i => i.isCancelled == data.IsCancelled.Value);
+
+            query = query.OrderByDescending(i => i.IssueDate);
+           
+            return await query.ToListAsync();
         }
     }
 }

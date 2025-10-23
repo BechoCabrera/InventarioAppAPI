@@ -1,5 +1,6 @@
 ﻿using InventarioBackend.Core.Application.Billing.DTOs;
 using InventarioBackend.Core.Domain.Billing.Interfaces;
+using InventarioBackend.src.Core.Application.Billing.DTOs;
 using InventarioBackend.src.Core.Application.Billing.Interfaces;
 using InventarioBackend.src.Core.Application.Products.Services;
 using InventarioBackend.src.Core.Application.Settings.Services;
@@ -24,8 +25,15 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
 
         public async Task<List<InvoiceDto>> GetAllAsync()
         {
-            var invoices = await _repository.GetAllAsync();
-            return invoices.Adapt<List<InvoiceDto>>();
+            try
+            {
+                var invoices = await _repository.GetAllAsync();
+                return invoices.Adapt<List<InvoiceDto>>();
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
         public async Task<List<InvoiceDto>> GetByEntitiAsync(Guid id)
         {
@@ -95,6 +103,11 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
         public async Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string number)
         {
             var result = await _repository.GetInvoicesByNumberAsync(number);
+            return result.Adapt<List<InvoiceDto>>();
+        } 
+        public async Task<List<InvoiceDto>> GetInvoicesByFiltersAsync(SearchInvoiceRequest data, Guid entitiId)
+        {
+            var result = await _repository.GetInvoicesByFiltersAsync(data, entitiId);
             return result.Adapt<List<InvoiceDto>>();
         }
     }
