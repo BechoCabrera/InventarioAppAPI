@@ -18,5 +18,8 @@ namespace InventarioBackend.Core.Application.Billing.DTOs
         public string? NameClientDraft { get; set; }
         public string? NitClientDraft { get; set; }
         public List<InvoiceDetailCreateDto> Details { get; set; } = new();
+
+        public decimal DiscountAmount { get; set; }
+        public string? PromotionApplied { get; set; }
     }
 }

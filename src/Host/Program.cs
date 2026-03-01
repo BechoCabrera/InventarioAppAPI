@@ -46,6 +46,10 @@ using InventarioBackend.Core.Domain.Billing.Interfaces;
 using InventarioBackend.Infrastructure.Data.Repositories.Billing;
 using InventarioBackend.Infrastructure.Data.Repositories.Clients;
 using InventarioBackend.src.Core.Domain.CashClosings.Services;
+using InventarioBackend.src.Core.Domain.Promotions.Interfaces;
+using InventarioBackend.src.Infrastructure.Data.Repositories.Promotions;
+using InventarioBackend.src.Core.Application.Promotions.Interfaces;
+using InventarioBackend.src.Core.Application.Promotions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -118,6 +122,9 @@ builder.Services.AddScoped<ICashClosingRepository, CashClosingRepository>();
 
 builder.Services.AddScoped<IInvoiceCancellationService, InvoiceCancellationService>();
 builder.Services.AddScoped<IInvoiceCancellationRepository, InvoiceCancellationRepository>();
+
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
 
 builder.Services.AddHttpContextAccessor();
 

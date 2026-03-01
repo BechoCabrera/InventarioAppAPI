@@ -29,7 +29,9 @@ namespace InventarioBackend.src.Core.Domain.Billing.Entities
         public Client? Client { get; set; } = default!;
         public EntitiConfig? EntitiConfigs { get; set; } = default!;
         public InvoicesCancelled? InvoicesCancelled { get; set; } = default!;
-       
+        //tema de descuento
+        public decimal DiscountAmount { get; set; }
+        public string? PromotionApplied { get; set; }
 
     }
 }

@@ -23,5 +23,8 @@ namespace InventarioBackend.Core.Application.Billing.DTOs
         public Guid? EntitiId { get; set; }
         public bool isCancelled { get; set; }
         public List<InvoiceDetailDto?> Details { get; set; } = new();
+
+        public decimal DiscountAmount { get; set; }
+        public string? PromotionApplied { get; set; }
     }
 }

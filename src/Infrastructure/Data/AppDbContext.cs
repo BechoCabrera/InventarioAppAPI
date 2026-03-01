@@ -6,8 +6,10 @@ using InventarioBackend.src.Core.Domain.Clients.Entities;
 using InventarioBackend.src.Core.Domain.EntitiConfigs.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Entities;
+using InventarioBackend.src.Core.Domain.Promotions.Entities;
 using InventarioBackend.src.Core.Domain.Security.Entities;
 using InventarioBackend.src.Core.Domain.Settings.Entities;
+using InventarioBackend.src.Infrastructure.Data.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventarioBackend.src.Infrastructure.Data
@@ -33,6 +35,8 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<EntitiConfig> EntitiConfigs { get; set; }
         public DbSet<CashClosing> CashClosings { get; set; }
         public DbSet<InvoicesCancelled> InvoicesCancelled { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<PromotionProduct> PromotionProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -191,6 +195,9 @@ namespace InventarioBackend.src.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ProductConfig());
 
             // Aquí puedes agregar configuraciones adicionales de entidades, índices, etc.
+
+            modelBuilder.ApplyConfiguration(new PromotionConfiguration());
+            modelBuilder.ApplyConfiguration(new PromotionProductConfiguration());
         }
     }
 }
