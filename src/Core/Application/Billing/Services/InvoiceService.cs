@@ -154,7 +154,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
 
             foreach (var item in invoice.Details)
             {
-                Product? valueProduct = await _productService.GetByIdDomAsync(item.ProductId);
+                Product? valueProduct = null;//await _productService.GetByIdDomAsync(item.ProductId);
 
                 if (valueProduct != null && valueProduct.Stock >= valueProduct.StockSold)
                 {

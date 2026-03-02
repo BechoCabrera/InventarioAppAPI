@@ -21,40 +21,48 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
 
         public async Task<Guid> CreateAsync(PromotionCreateDto dto)
         {
-            var entitiIdClaim = _httpContextAccessor.HttpContext?
-                .User.FindFirst("entiti_id")?.Value;
+            try
+            {
+                var entitiIdClaim = _httpContextAccessor.HttpContext?
+             .User.FindFirst("entiti_id")?.Value;
 
-            if (string.IsNullOrEmpty(entitiIdClaim))
-                throw new Exception("Entidad no válida.");
+                if (string.IsNullOrEmpty(entitiIdClaim))
+                    throw new Exception("Entidad no válida.");
 
-            var entitiId = Guid.Parse(entitiIdClaim);
+                Guid entitiId = Guid.Parse(entitiIdClaim);
 
-            var promotion = dto.Adapt<Promotion>();
-            promotion.PromotionId = Guid.NewGuid();
-            promotion.EntitiId = entitiId;
-            promotion.IsActive = true;
+                Promotion promotion = dto.Adapt<Promotion>();
+                promotion.PromotionId = Guid.NewGuid();
+                promotion.EntitiId = entitiId;
+                promotion.IsActive = dto.IsActive;
 
-            promotion.PromotionProducts = dto.ProductIds
-                .Select(p => new PromotionProduct
-                {
-                    PromotionId = promotion.PromotionId,
-                    ProductId = p
-                }).ToList();
+                promotion.PromotionProducts = dto.ProductIds
+                    .Select(p => new PromotionProduct
+                    {
+                        PromotionId = promotion.PromotionId,
+                        ProductId = p
+                    }).ToList();
 
-            await _promotionRepository.AddAsync(promotion);
+                await _promotionRepository.AddAsync(promotion);
 
-            return promotion.PromotionId;
+                return promotion.PromotionId;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task<CalculatePromotionResponseDto> CalculateAsync(
-            List<CartItemDto> items,
-            Guid entitiId)
+    List<CartItemDto> items,
+    Guid entitiId)
         {
-            var promotions = await _promotionRepository
-                .GetActiveByEntitiAsync(entitiId);
+            var promotions = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
 
             decimal bestDiscount = 0;
             string? bestPromotion = null;
+            decimal bestPercentage = 0;
 
             foreach (var promo in promotions)
             {
@@ -65,8 +73,7 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 {
                     foreach (var item in items)
                     {
-                        if (promo.PromotionProducts
-                            .Any(p => p.ProductId == item.ProductId))
+                        if (promo.PromotionProducts.Any(p => p.ProductId == item.ProductId))
                         {
                             discount += item.UnitPrice * item.Quantity *
                                 (promo.Percentage / 100);
@@ -79,8 +86,7 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 {
                     foreach (var item in items)
                     {
-                        if (promo.PromotionProducts
-                            .Any(p => p.ProductId == item.ProductId) &&
+                        if (promo.PromotionProducts.Any(p => p.ProductId == item.ProductId) &&
                             item.Quantity >= promo.MinQuantity)
                         {
                             discount += item.UnitPrice * item.Quantity *
@@ -95,16 +101,13 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                     var requiredProducts = promo.PromotionProducts
                         .Select(x => x.ProductId).ToList();
 
-                    if (requiredProducts.All(rp =>
-                        items.Any(i => i.ProductId == rp)))
+                    if (requiredProducts.All(rp => items.Any(i => i.ProductId == rp)))
                     {
                         var comboSubtotal = items
-                            .Where(i => requiredProducts
-                                .Contains(i.ProductId))
+                            .Where(i => requiredProducts.Contains(i.ProductId))
                             .Sum(i => i.UnitPrice);
 
-                        discount = comboSubtotal *
-                            (promo.Percentage / 100);
+                        discount = comboSubtotal * (promo.Percentage / 100);
                     }
                 }
 
@@ -112,22 +115,70 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 {
                     bestDiscount = discount;
                     bestPromotion = promo.Name;
+                    bestPercentage = promo.Percentage; // Guarda el porcentaje de la mejor promo
                 }
             }
 
             return new CalculatePromotionResponseDto
             {
                 DiscountAmount = bestDiscount,
-                PromotionName = bestPromotion
+                PromotionName = bestPromotion,
+                Percentage = bestPercentage // Retorna el porcentaje aplicado
             };
         }
 
-        public async Task<List<object>> GetByEntitiAsync(Guid entitiId)
+        public async Task<List<PromotionDto>> GetByEntitiAsync(Guid entitiId)
         {
-            var promotions = await _promotionRepository
-                .GetByEntitiAsync(entitiId);
+            List<Promotion> promotions = await _promotionRepository.GetByEntitiAsync(entitiId);
 
-            return promotions.Adapt<List<object>>();
+            var result = promotions.Select(p => new PromotionDto
+            {
+                PromotionId = p.PromotionId,
+                Name = p.Name,
+                Type = p.Type,
+                Percentage = p.Percentage,
+                MinQuantity = p.MinQuantity,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                IsActive = p.IsActive,
+                ProductIds = p.PromotionProducts?.Select(pp => pp.ProductId).ToList() ?? new List<Guid>(),
+                Products = p.PromotionProducts?.Select(pp => new PromotionProductDto
+                {
+                    ProductId = pp.ProductId,
+                    ProductName = pp.Product?.Name // Si tienes la relación cargada
+                }).ToList() ?? new List<PromotionProductDto>()
+            }).ToList();
+
+            return result; // <-- Así devuelves el DTO enriquecido
+
+        }
+
+        public async Task<bool> UpdateAsync(PromotionDto dto, Guid entitiId)
+        {
+            var promotions = await _promotionRepository.GetByEntitiAsync(entitiId);
+            var promotion = promotions.FirstOrDefault(p => p.PromotionId == dto.PromotionId);
+
+            if (promotion == null)
+                return false;
+
+            // Actualiza los campos
+            promotion.Name = dto.Name;
+            promotion.Type = dto.Type;
+            promotion.Percentage = dto.Percentage;
+            promotion.MinQuantity = dto.MinQuantity;
+            promotion.StartDate = dto.StartDate;
+            promotion.EndDate = dto.EndDate;
+            promotion.IsActive = dto.IsActive;
+
+            // Actualiza productos asociados
+            promotion.PromotionProducts = dto.ProductIds.Select(pid => new PromotionProduct
+            {
+                PromotionId = promotion.PromotionId,
+                ProductId = pid
+            }).ToList();
+
+            await _promotionRepository.UpdateAsync(promotion);
+            return true;
         }
 
         public async Task<string> ToggleStatusAsync(Guid id)
@@ -153,13 +204,13 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
         }
 
         public async Task<string> DeleteAsync(Guid id)
-{
-    var result = await _promotionRepository.DeleteAsync(id);
+        {
+            var result = await _promotionRepository.DeleteAsync(id);
 
-    if (!result)
-        throw new Exception("No se pudo eliminar la promoción.");
+            if (!result)
+                throw new Exception("No se pudo eliminar la promoción.");
 
-    return "Promoción eliminada correctamente.";
-}
+            return "Promoción eliminada correctamente.";
+        }
     }
 }

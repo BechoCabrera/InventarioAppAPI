@@ -18,5 +18,7 @@ namespace InventarioBackend.src.Core.Application.Products.DTOs
         public string? EntitiName { get; set; }
         public string? Username { get; set; }
         public string? CategoryName { get; set; }
+        public List<ProductDiscountDto> Discounts { get; set; } = new();
+
     }
 }

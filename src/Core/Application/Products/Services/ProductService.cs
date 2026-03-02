@@ -2,6 +2,7 @@
 using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
+using InventarioBackend.src.Core.Domain.Promotions.Interfaces;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -13,11 +14,13 @@ namespace InventarioBackend.src.Core.Application.Products.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IProductRepository _productRepository;
+        private readonly IPromotionRepository _promotionRepository;
 
-        public ProductService(IProductRepository productRepository, IHttpContextAccessor httpContextAccessor)
+        public ProductService(IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IPromotionRepository promotionRepository)
         {
             _productRepository = productRepository;
             _httpContextAccessor = httpContextAccessor;
+            _promotionRepository = promotionRepository;
         }
 
         public async Task<List<ProductDto>> GetAllAsync()
@@ -25,22 +28,133 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             var products = await _productRepository.GetAllAsync();
             return products.Adapt<List<ProductDto>>();
         }
+        //public async Task<List<ProductDto>> GetByEntitiAsync(Guid entitiId)
+        //{
+        //    var products = await _productRepository.GetByEntitiAsync(entitiId);
+        //    return products.Adapt<List<ProductDto>>();
+        //}
+
         public async Task<List<ProductDto>> GetByEntitiAsync(Guid entitiId)
         {
             var products = await _productRepository.GetByEntitiAsync(entitiId);
-            return products.Adapt<List<ProductDto>>();
+
+            // Inyecta el repositorio de promociones en el servicio
+            var promociones = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
+
+            var result = products.Select(product => new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                Stock = product.Stock,
+                StockSold = product.StockSold,
+                Category = product.Category?.Name,
+                IsActive = product.IsActive,
+                RegUserId = product.RegUserId,
+                EntitiId = product.EntitiId,
+                BarCode = product.BarCode ?? string.Empty,
+                EntitiName = product.EntitiConfigs?.EntitiName,
+                Username = product.User?.Name,
+                CategoryName = product.Category?.Name,
+                Discounts = promociones
+                    .Where(promo => promo.PromotionProducts.Any(pp => pp.ProductId == product.ProductId))
+                    .Select(promo => new ProductDiscountDto
+                    {
+                        PromotionId = promo.PromotionId,
+                        PromotionName = promo.Name,
+                        Percentage = promo.Percentage,
+                        StartDate = promo.StartDate,
+                        EndDate = promo.EndDate,
+                        IsActive = promo.IsActive
+                    }).ToList()
+            }).ToList();
+
+            return result;
         }
+
+
         public async Task<ProductDto?> GetByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return product?.Adapt<ProductDto>();
+            if (product == null) return null;
+
+            var entitiId = product.EntitiId ?? Guid.Empty;
+            var promociones = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
+
+            var dto = new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                Stock = product.Stock,
+                StockSold = product.StockSold,
+                Category = product.Category?.Name,
+                IsActive = product.IsActive,
+                RegUserId = product.RegUserId,
+                EntitiId = product.EntitiId,
+                BarCode = product.BarCode ?? string.Empty,
+                EntitiName = product.EntitiConfigs?.EntitiName,
+                Username = product.User?.Name,
+                CategoryName = product.Category?.Name,
+                Discounts = promociones
+                    .Where(promo => promo.PromotionProducts.Any(pp => pp.ProductId == product.ProductId))
+                    .Select(promo => new ProductDiscountDto
+                    {
+                        PromotionId = promo.PromotionId,
+                        PromotionName = promo.Name,
+                        Percentage = promo.Percentage,
+                        StartDate = promo.StartDate,
+                        EndDate = promo.EndDate,
+                        IsActive = promo.IsActive
+                    }).ToList()
+            };
+
+            return dto;
         }
 
-        public async Task<Product?> GetByIdDomAsync(Guid id)
+
+        public async Task<ProductDto?> GetByIdDomAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return product;
+            if (product == null) return null;
+
+            var entitiId = product.EntitiId ?? Guid.Empty;
+            var promociones = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
+
+            var dto = new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                Stock = product.Stock,
+                StockSold = product.StockSold,
+                Category = product.Category?.Name,
+                IsActive = product.IsActive,
+                RegUserId = product.RegUserId,
+                EntitiId = product.EntitiId,
+                BarCode = product.BarCode ?? string.Empty,
+                EntitiName = product.EntitiConfigs?.EntitiName,
+                Username = product.User?.Name,
+                CategoryName = product.Category?.Name,
+                Discounts = promociones
+                    .Where(promo => promo.PromotionProducts.Any(pp => pp.ProductId == product.ProductId))
+                    .Select(promo => new ProductDiscountDto
+                    {
+                        PromotionId = promo.PromotionId,
+                        PromotionName = promo.Name,
+                        Percentage = promo.Percentage,
+                        StartDate = promo.StartDate,
+                        EndDate = promo.EndDate,
+                        IsActive = promo.IsActive
+                    }).ToList()
+            };
+
+            return dto;
         }
+
 
         public async Task<Guid> CreateAsync(ProductCreateDto dto)
         {
@@ -99,14 +213,80 @@ namespace InventarioBackend.src.Core.Application.Products.Services
         public async Task<List<ProductDto>> SearchByNameAsync(string name, Guid entitiId)
         {
             var products = await _productRepository.SearchByNameAsync(name, entitiId);
-            return products.Adapt<List<ProductDto>>();
+            var promociones = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
+
+            var result = products.Select(product => new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                Stock = product.Stock,
+                StockSold = product.StockSold,
+                Category = product.Category?.Name,
+                IsActive = product.IsActive,
+                RegUserId = product.RegUserId,
+                EntitiId = product.EntitiId,
+                BarCode = product.BarCode ?? string.Empty,
+                EntitiName = product.EntitiConfigs?.EntitiName,
+                Username = product.User?.Name,
+                CategoryName = product.Category?.Name,
+                Discounts = promociones
+                    .Where(promo => promo.PromotionProducts.Any(pp => pp.ProductId == product.ProductId))
+                    .Select(promo => new ProductDiscountDto
+                    {
+                        PromotionId = promo.PromotionId,
+                        PromotionName = promo.Name,
+                        Percentage = promo.Percentage,
+                        StartDate = promo.StartDate,
+                        EndDate = promo.EndDate,
+                        IsActive = promo.IsActive
+                    }).ToList()
+            }).ToList();
+
+            return result;
         }
+
 
         public async Task<ProductDto?> GetByBarCodeAsync(string barCode, Guid entitiId)
         {
             var product = await _productRepository.GetByBarCodeAsync(barCode, entitiId);
-            return product?.Adapt<ProductDto>();
+            if (product == null) return null;
+
+            var promociones = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
+
+            var dto = new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                UnitPrice = product.UnitPrice,
+                Stock = product.Stock,
+                StockSold = product.StockSold,
+                Category = product.Category?.Name,
+                IsActive = product.IsActive,
+                RegUserId = product.RegUserId,
+                EntitiId = product.EntitiId,
+                BarCode = product.BarCode ?? string.Empty,
+                EntitiName = product.EntitiConfigs?.EntitiName,
+                Username = product.User?.Name,
+                CategoryName = product.Category?.Name,
+                Discounts = promociones
+                    .Where(promo => promo.PromotionProducts.Any(pp => pp.ProductId == product.ProductId))
+                    .Select(promo => new ProductDiscountDto
+                    {
+                        PromotionId = promo.PromotionId,
+                        PromotionName = promo.Name,
+                        Percentage = promo.Percentage,
+                        StartDate = promo.StartDate,
+                        EndDate = promo.EndDate,
+                        IsActive = promo.IsActive
+                    }).ToList()
+            };
+
+            return dto;
         }
+
 
         public async Task<ProductDto?> IncreaseStockAsync(Guid productId, int quantity)
         {

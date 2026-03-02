@@ -8,11 +8,13 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Promotions
     {
         private readonly AppDbContext _context;
         private readonly DbSet<Promotion> _dbSet;
+        private readonly DbSet<PromotionProduct> _dbSetPromotionProducts;
 
         public PromotionRepository(AppDbContext context)
         {
             _context = context;
             _dbSet = context.Set<Promotion>();
+            _dbSetPromotionProducts = context.Set<PromotionProduct>();
         }
 
         public async Task AddAsync(Promotion promotion)
@@ -25,7 +27,7 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Promotions
         {
             return await _context.Set<Promotion>()
                 .Where(p => p.EntitiId == entitiId)
-                .Include(p => p.PromotionProducts)
+                .Include(p => p.PromotionProducts).ThenInclude(pp => pp.Product)
                 .ToListAsync();
         }
 
@@ -37,8 +39,8 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Promotions
                 .Where(p =>
                     p.EntitiId == entitiId &&
                     p.IsActive &&
-                    p.StartDate <= now &&
-                    p.EndDate >= now)
+                    p.StartDate.Date <= now.Date &&
+                    p.EndDate.Date >= now.Date)
                 .Include(p => p.PromotionProducts)
                 .ToListAsync();
         }
@@ -52,11 +54,19 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Promotions
         public async Task<bool> DeleteAsync(Guid id)
         {
             var promotion = await _context.Promotions
-                .FindAsync(id);
+                .Include(p => p.PromotionProducts)
+                .FirstOrDefaultAsync(p => p.PromotionId == id);
 
             if (promotion == null)
                 return false;
 
+            // Elimina los productos asociados a la promoción
+            if (promotion.PromotionProducts != null && promotion.PromotionProducts.Any())
+            {
+                _context.PromotionProducts.RemoveRange(promotion.PromotionProducts);
+            }
+
+            // Elimina la promoción
             _context.Promotions.Remove(promotion);
             await _context.SaveChangesAsync();
 

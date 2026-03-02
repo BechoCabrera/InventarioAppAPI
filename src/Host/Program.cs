@@ -140,6 +140,7 @@ TypeAdapterConfig.GlobalSettings.Scan(typeof(EntitiConfigMapping).Assembly);
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All);
+    //options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
 });
 
 // ================= Swagger ======================

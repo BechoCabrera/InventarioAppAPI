@@ -20,6 +20,8 @@ namespace InventarioBackend.src.Core.Domain.Promotions.Entities
         public bool IsActive { get; set; }
 
         public Guid EntitiId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
 
         public ICollection<PromotionProduct> PromotionProducts { get; set; }
     }
