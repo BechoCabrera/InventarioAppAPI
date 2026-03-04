@@ -61,7 +61,10 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
             var promotions = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
 
             decimal bestDiscount = 0;
-            string? bestPromotion = null;
+            string bestPromotion = null;
+            List<string> promotionsActive = new List<string>();
+            string promotionsUnit = null;
+
             decimal bestPercentage = 0;
 
             foreach (var promo in promotions)
@@ -111,11 +114,12 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                     }
                 }
 
-                if (discount > bestDiscount)
+                if (discount > 0)
                 {
-                    bestDiscount = discount;
+                    bestDiscount += discount;
                     bestPromotion = promo.Name;
                     bestPercentage = promo.Percentage; // Guarda el porcentaje de la mejor promo
+                    promotionsActive.Add(bestPromotion);
                 }
             }
 
@@ -123,7 +127,8 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
             {
                 DiscountAmount = bestDiscount,
                 PromotionName = bestPromotion,
-                Percentage = bestPercentage // Retorna el porcentaje aplicado
+                Percentage = bestPercentage,
+                PromotionsNames = string.Join(",", promotionsActive)
             };
         }
 

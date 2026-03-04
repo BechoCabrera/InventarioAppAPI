@@ -11,6 +11,8 @@ namespace InventarioBackend.src.Core.Application.Billing.DTOs
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
         public string ProductName { get; set; } = string.Empty;
+        public decimal DiscountAmount { get; set; }
+        public string? PromotionApplied { get; set; }
     }
 }
 

@@ -11,6 +11,8 @@ namespace InventarioBackend.Core.Domain.Billing
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public string? PromotionApplied { get; set; }
 
         // TotalPrice calculado en la base, pero puedes calcularlo aquí también
         public decimal TotalPrice => Quantity * UnitPrice;

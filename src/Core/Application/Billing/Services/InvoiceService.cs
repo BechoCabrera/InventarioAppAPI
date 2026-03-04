@@ -9,6 +9,8 @@ using InventarioBackend.src.Core.Domain.Billing.Entities;
 using InventarioBackend.src.Core.Domain.Products;
 using Mapster;
 using InventarioBackend.src.Core.Application.Promotions.DTOs;
+using InventarioBackend.src.Infrastructure.Data;
+using InventarioBackend.src.Core.Domain.Products.Interfaces;
 
 namespace InventarioBackend.src.Core.Application.Billing.Services
 {
@@ -18,14 +20,18 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
         private readonly IPromotionService _promotionService;
         private readonly ConsecutiveSettingsService _consecutiveSettingsService;
         private readonly ProductService _productService;
+        private readonly IProductRepository _productRepository;
+        private readonly AppDbContext _context;
         public InvoiceService(IInvoiceRepository repository, ConsecutiveSettingsService consecutiveSettingsService,
             ProductService productService,
-             IPromotionService promotionService)
+             IPromotionService promotionService, AppDbContext context, IProductRepository productRepository)
         {
             _productService = productService;
             _repository = repository;
             _consecutiveSettingsService = consecutiveSettingsService;
             _promotionService = promotionService;
+            _context = context;
+            _productRepository = productRepository;
 
         }
 
@@ -52,48 +58,6 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             var invoice = await _repository.GetByIdAsync(id);
             return invoice?.Adapt<InvoiceDto>();
         }
-
-        //public async Task<InvoiceDto> AddAsync(InvoiceCreateDto dto)
-        //{
-        //    var invoice = dto.Adapt<Invoice>();
-        //    invoice.InvoiceNumber = await _consecutiveSettingsService.GetNextConsecutiveAsync("ConsecutivoFactura");
-        //    invoice.DueDate = DateTime.Now;
-        //    invoice.IssueDate = DateTime.Now;
-        //    invoice.CreatedAt = DateTime.Now;
-        //    invoice.NitClientDraft = invoice.NitClientDraft;
-        //    invoice.NameClientDraft = invoice.NameClientDraft != null ? invoice.NameClientDraft.ToUpper() : null;
-        //    foreach (var item in invoice.Details)
-        //    {
-        //        Product? valueProduct = await _productService.GetByIdDomAsync(item.ProductId);
-        //        if (valueProduct != null && valueProduct.Stock >= valueProduct.StockSold)
-        //        {
-        //            valueProduct.StockSold = item.Quantity + valueProduct.StockSold;
-        //            await _productService.UpdateAsync(valueProduct);
-        //        }
-        //    }
-
-        //    var savedInvoice = await _repository.AddAsync(invoice);
-
-        //    return savedInvoice.Adapt<InvoiceDto>();
-        //}
-
-        //public async Task UpdateAsync(Guid id, InvoiceCreateDto dto)
-        //{
-        //    try
-        //    {
-        //        var invoice = await _repository.GetByIdAsync(id);
-        //        if (invoice == null) return;
-
-        //        dto.Adapt(invoice);
-        //        invoice.UpdatedAt = DateTime.UtcNow;
-        //        await _repository.UpdateAsync(invoice);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-
-        //}
 
         public async Task UpdateAsync(Guid id, InvoiceCreateDto dto)
         {
@@ -137,8 +101,12 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
                 UnitPrice = d.UnitPrice
             }).ToList();
 
-            var promotionResult = await _promotionService
-                .CalculateAsync(promotionItems, invoice.EntitiId.Value);
+            CalculatePromotionResponseDto? promotionResult = null;
+            if (invoice.EntitiId.HasValue)
+            {
+                promotionResult = await _promotionService
+                    .CalculateAsync(promotionItems, invoice.EntitiId.Value);
+            }
 
             var discount = promotionResult?.DiscountAmount ?? 0;
             var promotionName = promotionResult?.PromotionName;
@@ -149,21 +117,42 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             invoice.TaxAmount = subtotalWithDiscount * 0.19m; // IVA
             invoice.TotalAmount = subtotalWithDiscount + invoice.TaxAmount;
 
-            invoice.TaxAmount = subtotalWithDiscount * 0.19m;
-            invoice.TotalAmount = subtotalWithDiscount + invoice.TaxAmount;
+            // Ejecutar las actualizaciones de stock y creación de factura dentro de una transacción
+            Invoice savedInvoice = null!;
 
-            foreach (var item in invoice.Details)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Product? valueProduct = null;//await _productService.GetByIdDomAsync(item.ProductId);
-
-                if (valueProduct != null && valueProduct.Stock >= valueProduct.StockSold)
+                // Validar y actualizar StockSold de cada producto
+                foreach (var item in invoice.Details)
                 {
-                    valueProduct.StockSold += item.Quantity;
-                    await _productService.UpdateAsync(valueProduct);
-                }
-            }
+                    Product? valueProduct = await _productRepository.GetByIdAsync(item.ProductId);
 
-            var savedInvoice = await _repository.AddAsync(invoice);
+                    if (valueProduct == null)
+                    {
+                        throw new InvalidOperationException($"Producto no encontrado. Id: {item.ProductId}");
+                    }
+
+                    var available = valueProduct.Stock - valueProduct.StockSold;
+                    if (available < item.Quantity)
+                    {
+                        throw new InvalidOperationException($"No hay suficiente stock para el producto '{valueProduct.Name}'. Disponible: {available}, solicitado: {item.Quantity}");
+                    }
+
+                    valueProduct.StockSold += item.Quantity;
+                    await _productRepository.UpdateAsync(valueProduct);
+                }
+
+                // Guardar la factura
+                savedInvoice = await _repository.AddAsync(invoice);
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return savedInvoice.Adapt<InvoiceDto>();
         }
