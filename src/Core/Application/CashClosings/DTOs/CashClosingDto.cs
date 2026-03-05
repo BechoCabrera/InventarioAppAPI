@@ -14,7 +14,6 @@
         public Guid? EntitiId { get; set; }
         public string? EntitiName { get; set; }
         public string? UserName { get; set; }
-        
-        
+        public decimal DiscountAmount { get; set; }
     }
 }

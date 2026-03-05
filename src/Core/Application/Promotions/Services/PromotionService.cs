@@ -1,4 +1,5 @@
-﻿using InventarioBackend.src.Core.Application.Promotions.DTOs;
+﻿using InventarioBackend.src.Core.Application.Products.DTOs;
+using InventarioBackend.src.Core.Application.Promotions.DTOs;
 using InventarioBackend.src.Core.Application.Promotions.Interfaces;
 using InventarioBackend.src.Core.Domain.Promotions.Entities;
 using InventarioBackend.src.Core.Domain.Promotions.Interfaces;
@@ -55,17 +56,18 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
         }
 
         public async Task<CalculatePromotionResponseDto> CalculateAsync(
-    List<CartItemDto> items,
-    Guid entitiId)
+         List<CartItemDto> items,
+         Guid entitiId)
         {
             var promotions = await _promotionRepository.GetActiveByEntitiAsync(entitiId);
 
             decimal bestDiscount = 0;
             string bestPromotion = null;
             List<string> promotionsActive = new List<string>();
-            string promotionsUnit = null;
-
             decimal bestPercentage = 0;
+
+            // Diccionario para acumular descuentos por producto
+            var productDiscounts = new Dictionary<Guid, ProductDiscountDto>();
 
             foreach (var promo in promotions)
             {
@@ -78,8 +80,24 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                     {
                         if (promo.PromotionProducts.Any(p => p.ProductId == item.ProductId))
                         {
-                            discount += item.UnitPrice * item.Quantity *
-                                (promo.Percentage / 100);
+                            var itemDiscount = item.UnitPrice * item.Quantity * (promo.Percentage / 100);
+                            discount += itemDiscount;
+
+                            if (!productDiscounts.ContainsKey(item.ProductId))
+                            {
+                                productDiscounts[item.ProductId] = new ProductDiscountDto
+                                {
+                                    ProductId = item.ProductId,
+                                    PromotionId = promo.PromotionId,
+                                    PromotionName = promo.Name,
+                                    Percentage = promo.Percentage,
+                                    StartDate = promo.StartDate,
+                                    EndDate = promo.EndDate,
+                                    IsActive = promo.IsActive,
+                                    Discount = 0
+                                };
+                            }
+                            productDiscounts[item.ProductId].Discount += itemDiscount;
                         }
                     }
                 }
@@ -92,8 +110,24 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                         if (promo.PromotionProducts.Any(p => p.ProductId == item.ProductId) &&
                             item.Quantity >= promo.MinQuantity)
                         {
-                            discount += item.UnitPrice * item.Quantity *
-                                (promo.Percentage / 100);
+                            var itemDiscount = item.UnitPrice * item.Quantity * (promo.Percentage / 100);
+                            discount += itemDiscount;
+
+                            if (!productDiscounts.ContainsKey(item.ProductId))
+                            {
+                                productDiscounts[item.ProductId] = new ProductDiscountDto
+                                {
+                                    ProductId = item.ProductId,
+                                    PromotionId = promo.PromotionId,
+                                    PromotionName = promo.Name,
+                                    Percentage = promo.Percentage,
+                                    StartDate = promo.StartDate,
+                                    EndDate = promo.EndDate,
+                                    IsActive = promo.IsActive,
+                                    Discount = 0
+                                };
+                            }
+                            productDiscounts[item.ProductId].Discount += itemDiscount;
                         }
                     }
                 }
@@ -106,11 +140,34 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
 
                     if (requiredProducts.All(rp => items.Any(i => i.ProductId == rp)))
                     {
-                        var comboSubtotal = items
-                            .Where(i => requiredProducts.Contains(i.ProductId))
-                            .Sum(i => i.UnitPrice);
+                        var comboItems = items.Where(i => requiredProducts.Contains(i.ProductId)).ToList();
+                        var comboSubtotal = comboItems.Sum(i => i.UnitPrice);
 
-                        discount = comboSubtotal * (promo.Percentage / 100);
+                        var comboDiscount = comboSubtotal * (promo.Percentage / 100);
+                        discount = comboDiscount;
+
+                        // Repartir el descuento proporcionalmente entre los productos del combo
+                        foreach (var item in comboItems)
+                        {
+                            var proportion = item.UnitPrice / comboSubtotal;
+                            var itemDiscount = comboDiscount * proportion;
+
+                            if (!productDiscounts.ContainsKey(item.ProductId))
+                            {
+                                productDiscounts[item.ProductId] = new ProductDiscountDto
+                                {
+                                    ProductId = item.ProductId,
+                                    PromotionId = promo.PromotionId,
+                                    PromotionName = promo.Name,
+                                    Percentage = promo.Percentage,
+                                    StartDate = promo.StartDate,
+                                    EndDate = promo.EndDate,
+                                    IsActive = promo.IsActive,
+                                    Discount = 0
+                                };
+                            }
+                            productDiscounts[item.ProductId].Discount += itemDiscount;
+                        }
                     }
                 }
 
@@ -118,19 +175,24 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 {
                     bestDiscount += discount;
                     bestPromotion = promo.Name;
-                    bestPercentage = promo.Percentage; // Guarda el porcentaje de la mejor promo
+                    bestPercentage = promo.Percentage;
                     promotionsActive.Add(bestPromotion);
                 }
             }
+
+            // Convertir el diccionario a lista de DTOs
+            var productDiscountsList = productDiscounts.Values.ToList();
 
             return new CalculatePromotionResponseDto
             {
                 DiscountAmount = bestDiscount,
                 PromotionName = bestPromotion,
                 Percentage = bestPercentage,
-                PromotionsNames = string.Join(",", promotionsActive)
+                PromotionsNames = string.Join(",", promotionsActive),
+                ProductDiscounts = productDiscountsList
             };
         }
+
 
         public async Task<List<PromotionDto>> GetByEntitiAsync(Guid entitiId)
         {

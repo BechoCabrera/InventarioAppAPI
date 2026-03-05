@@ -178,10 +178,15 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
         }
 
-        public async Task<bool> UpdateAsync(ProductUpdateDto product)
+        public async Task<bool> UpdateAsync(ProductUpdateDto product, Guid entitiId)
         {
             var existingProduct = await _productRepository.GetByIdAsync(product.ProductId);
             if (existingProduct == null) return false;
+
+            var barCodExit = await _productRepository.GetByBarCodeAsync(product.BarCode, entitiId);
+
+            if (barCodExit != null && product.ProductId != barCodExit.ProductId)
+                throw new Exception("El Cod:" + barCodExit.BarCode + " Ya existe. lo tiene el producto " + barCodExit.Name);
 
             existingProduct.UpdatedAt = DateTime.UtcNow;
             existingProduct.Name = product.Name;
@@ -190,11 +195,12 @@ namespace InventarioBackend.src.Core.Application.Products.Services
             existingProduct.Stock = existingProduct.Stock;
             existingProduct.CategoryId = product.CategoryId;
             existingProduct.IsActive = product.IsActive;
+            existingProduct.BarCode = product.BarCode;
 
             await _productRepository.UpdateAsync(existingProduct);
             return true;
-        }  
-        
+        }
+
         public async Task<bool> UpdateAsync(Product value)
         {
             await _productRepository.UpdateAsync(value);
@@ -296,7 +302,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
                 return null;
             }
             product.Stock += quantity;
-           
+
             await _productRepository.UpdateAsync(product);
             return product?.Adapt<ProductDto>();
         }
@@ -317,7 +323,7 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
             await _productRepository.UpdateAsync(product);
             return product?.Adapt<ProductDto>();
-            
+
         }
 
     }

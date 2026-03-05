@@ -29,9 +29,9 @@ namespace InventarioBackend.src.Core.Application.CashClosings.Services
             cashClosing.Date = DateTime.Now;
             cashClosing.CreatedBy = createdBy; // Asignar el usuario que crea el cierre
             cashClosing.EntitiId = entitiId; // Asignar la entidad
-
+            
             // Calcular el total general
-            cashClosing.TotalAmount = cashClosing.TotalCash + cashClosing.TotalCredit + cashClosing.TotalCard + cashClosing.TotalTransfer;
+            cashClosing.TotalAmount = cashClosing.TotalCash + cashClosing.TotalCredit + cashClosing.TotalCard + cashClosing.TotalTransfer - cashClosing.DiscountAmount;
 
             _context.CashClosings.Add(cashClosing);
             await _context.SaveChangesAsync();

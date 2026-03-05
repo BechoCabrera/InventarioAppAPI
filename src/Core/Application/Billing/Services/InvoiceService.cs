@@ -11,6 +11,7 @@ using Mapster;
 using InventarioBackend.src.Core.Application.Promotions.DTOs;
 using InventarioBackend.src.Infrastructure.Data;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventarioBackend.src.Core.Application.Billing.Services
 {
@@ -41,11 +42,12 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             {
                 var invoices = await _repository.GetAllAsync();
                 return invoices.Adapt<List<InvoiceDto>>();
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            
+
         }
         public async Task<List<InvoiceDto>> GetByEntitiAsync(Guid id)
         {
@@ -114,48 +116,59 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             var subtotalWithDiscount = subtotal - discount;
 
             invoice.SubtotalAmount = subtotal;
-            invoice.TaxAmount = subtotalWithDiscount * 0.19m; // IVA
+            //invoice.TaxAmount = subtotalWithDiscount; // IVA
             invoice.TotalAmount = subtotalWithDiscount + invoice.TaxAmount;
 
-            // Ejecutar las actualizaciones de stock y creación de factura dentro de una transacción
             Invoice savedInvoice = null!;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            // SOLUCIÓN: Usa la estrategia de ejecución
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                // Validar y actualizar StockSold de cada producto
-                foreach (var item in invoice.Details)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    Product? valueProduct = await _productRepository.GetByIdAsync(item.ProductId);
-
-                    if (valueProduct == null)
+                    foreach (var item in invoice.Details)
                     {
-                        throw new InvalidOperationException($"Producto no encontrado. Id: {item.ProductId}");
+                        Product? valueProduct = await _productRepository.GetByIdAsync(item.ProductId);
+
+                        if (valueProduct == null)
+                        {
+                            throw new InvalidOperationException($"Producto no encontrado. Id: {item.ProductId}");
+                        }
+
+                        var available = valueProduct.Stock - valueProduct.StockSold;
+                        if (available < item.Quantity)
+                        {
+                            throw new InvalidOperationException($"No hay suficiente stock para el producto '{valueProduct.Name}'. Disponible: {available}, solicitado: {item.Quantity}");
+                        }
+                        var result = promotionResult.ProductDiscounts.Where(x => x.ProductId == valueProduct.ProductId).FirstOrDefault();
+                        if (result != null)
+                        {
+                            item.DiscountAmount = result.Discount / item.Quantity;
+                            item.PromotionApplied = result.PromotionName + " con el " + result.Percentage + "%";
+                        }
+
+                        valueProduct.StockSold += item.Quantity;
+                        await _productRepository.UpdateAsync(valueProduct);
                     }
 
-                    var available = valueProduct.Stock - valueProduct.StockSold;
-                    if (available < item.Quantity)
-                    {
-                        throw new InvalidOperationException($"No hay suficiente stock para el producto '{valueProduct.Name}'. Disponible: {available}, solicitado: {item.Quantity}");
-                    }
+                    invoice.DiscountAmount = promotionResult.DiscountAmount;
+                    invoice.PromotionApplied = promotionResult.PromotionsNames;
+                    savedInvoice = await _repository.AddAsync(invoice);
 
-                    valueProduct.StockSold += item.Quantity;
-                    await _productRepository.UpdateAsync(valueProduct);
+                    await transaction.CommitAsync();
                 }
-
-                // Guardar la factura
-                savedInvoice = await _repository.AddAsync(invoice);
-
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
 
             return savedInvoice.Adapt<InvoiceDto>();
         }
+
 
         public async Task DeleteAsync(Guid id)
         {
@@ -172,7 +185,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
         {
             var result = await _repository.GetInvoicesByNumberAsync(number);
             return result.Adapt<List<InvoiceDto>>();
-        } 
+        }
         public async Task<List<InvoiceDto>> GetInvoicesByFiltersAsync(SearchInvoiceRequest data, Guid entitiId)
         {
             var result = await _repository.GetInvoicesByFiltersAsync(data, entitiId);

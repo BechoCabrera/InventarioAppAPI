@@ -10,5 +10,7 @@
         public Guid? CategoryId { get; set; }
         public Guid? EntitiId { get; set; }
         public bool IsActive { get; set; }
+        public string? BarCode { get; set; }
+
     }
 }

@@ -15,6 +15,7 @@ namespace InventarioBackend.src.Core.Domain.CashClosings.Entities
         public Guid? CreatedBy { get; set; } // Usuario que creó el cierre
         public DateTime CreatedAt { get; set; } // Fecha de creación
         public Guid? EntitiId { get; set; } // ID de la entidad (opcional)
+        public decimal DiscountAmount { get; set; }
         public EntitiConfig? EntitiConfigs { get; set; } 
         public User? User { get; set; } 
     }

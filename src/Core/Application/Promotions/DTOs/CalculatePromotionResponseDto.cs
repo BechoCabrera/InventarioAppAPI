@@ -1,4 +1,6 @@
-﻿namespace InventarioBackend.src.Core.Application.Promotions.DTOs
+﻿using InventarioBackend.src.Core.Application.Products.DTOs;
+
+namespace InventarioBackend.src.Core.Application.Promotions.DTOs
 {
     public class CalculatePromotionResponseDto
     {
@@ -6,6 +8,7 @@
         public string PromotionName { get; set; }
         public decimal Percentage { get; set; } // <-- Nuevo campo
         public string PromotionsNames{ get; set; } // <-- Nuevo campo
+        public List<ProductDiscountDto> ProductDiscounts { get; set; } // <-- Nuevo campo
 
     }
 }

@@ -73,7 +73,12 @@ namespace InventarioBackend.src.Host.Controllers
 
             try
             {
-                var updatedProduct = await _productService.UpdateAsync(product);
+                var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+                if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
+
+                var entitiId = Guid.Parse(entitiIdClaim);
+
+                var updatedProduct = await _productService.UpdateAsync(product, entitiId);
                 if (updatedProduct == null)
                 {
                     return NotFound("Producto no encontrado.");

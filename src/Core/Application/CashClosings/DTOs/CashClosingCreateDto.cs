@@ -8,5 +8,6 @@
         public decimal TotalCard { get; set; }
         public decimal TotalTransfer { get; set; }
         public Guid? EntitiId { get; set; }
+        public decimal DiscountAmount { get; set; }
     }
 }
