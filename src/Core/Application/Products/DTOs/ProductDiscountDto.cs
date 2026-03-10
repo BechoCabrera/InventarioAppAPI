@@ -10,6 +10,8 @@
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
         public decimal Discount { get; set; }
+        public int? MinRequired { get; set; } // <-- Nuevo campo
+
 
     }
 }

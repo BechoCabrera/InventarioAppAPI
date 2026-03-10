@@ -65,6 +65,8 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
             string bestPromotion = null;
             List<string> promotionsActive = new List<string>();
             decimal bestPercentage = 0;
+            int? minQuantity = 0;
+            List<Guid> idsProducts = new List<Guid>();
 
             // Diccionario para acumular descuentos por producto
             var productDiscounts = new Dictionary<Guid, ProductDiscountDto>();
@@ -135,39 +137,37 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 // ComboPercentage
                 if (promo.Type == 2)
                 {
-                    var requiredProducts = promo.PromotionProducts
+                    List<Guid> requiredProducts = promo.PromotionProducts
                         .Select(x => x.ProductId).ToList();
 
-                    if (requiredProducts.All(rp => items.Any(i => i.ProductId == rp)))
+                    var comboItems = items.Where(i => requiredProducts.Contains(i.ProductId)).ToList();
+                    var comboSubtotal = comboItems.Sum(i => i.UnitPrice);
+
+                    var comboDiscount = comboSubtotal * (promo.Percentage / 100);
+                    discount = comboDiscount;
+
+                    // Repartir el descuento proporcionalmente entre los productos del combo
+                    foreach (var item in comboItems)
                     {
-                        var comboItems = items.Where(i => requiredProducts.Contains(i.ProductId)).ToList();
-                        var comboSubtotal = comboItems.Sum(i => i.UnitPrice);
+                        var proportion = item.UnitPrice / comboSubtotal;
+                        var itemDiscount = comboDiscount * proportion;
 
-                        var comboDiscount = comboSubtotal * (promo.Percentage / 100);
-                        discount = comboDiscount;
-
-                        // Repartir el descuento proporcionalmente entre los productos del combo
-                        foreach (var item in comboItems)
+                        if (!productDiscounts.ContainsKey(item.ProductId))
                         {
-                            var proportion = item.UnitPrice / comboSubtotal;
-                            var itemDiscount = comboDiscount * proportion;
-
-                            if (!productDiscounts.ContainsKey(item.ProductId))
+                            productDiscounts[item.ProductId] = new ProductDiscountDto
                             {
-                                productDiscounts[item.ProductId] = new ProductDiscountDto
-                                {
-                                    ProductId = item.ProductId,
-                                    PromotionId = promo.PromotionId,
-                                    PromotionName = promo.Name,
-                                    Percentage = promo.Percentage,
-                                    StartDate = promo.StartDate,
-                                    EndDate = promo.EndDate,
-                                    IsActive = promo.IsActive,
-                                    Discount = 0
-                                };
-                            }
-                            productDiscounts[item.ProductId].Discount += itemDiscount;
+                                ProductId = item.ProductId,
+                                PromotionId = promo.PromotionId,
+                                PromotionName = promo.Name,
+                                Percentage = promo.Percentage,
+                                StartDate = promo.StartDate,
+                                EndDate = promo.EndDate,
+                                IsActive = promo.IsActive,
+                                Discount = 0
+                            };
                         }
+                        productDiscounts[item.ProductId].Discount += itemDiscount;
+
                     }
                 }
 
@@ -177,6 +177,12 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                     bestPromotion = promo.Name;
                     bestPercentage = promo.Percentage;
                     promotionsActive.Add(bestPromotion);
+                    minQuantity = promo.MinQuantity;
+
+                    foreach (var item in promo.PromotionProducts)
+                    {
+                        idsProducts.Add(item.ProductId);
+                    }
                 }
             }
 
@@ -189,7 +195,9 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 PromotionName = bestPromotion,
                 Percentage = bestPercentage,
                 PromotionsNames = string.Join(",", promotionsActive),
-                ProductDiscounts = productDiscountsList
+                ProductDiscounts = productDiscountsList,
+                MinQuantity = minQuantity,
+                IdsProducts = idsProducts
             };
         }
 
@@ -208,6 +216,7 @@ namespace InventarioBackend.src.Core.Application.Promotions.Services
                 StartDate = p.StartDate,
                 EndDate = p.EndDate,
                 IsActive = p.IsActive,
+                ProductName = string.Join(", ", p.PromotionProducts?.Select(pp => pp.Product?.Name) ?? new List<string>()),
                 ProductIds = p.PromotionProducts?.Select(pp => pp.ProductId).ToList() ?? new List<Guid>(),
                 Products = p.PromotionProducts?.Select(pp => new PromotionProductDto
                 {

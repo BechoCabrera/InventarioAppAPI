@@ -55,6 +55,14 @@ public class ClientService : IClientService
 
     public async Task DeleteAsync(Guid id)
     {
+        var client = await _clientRepository.GetByIdAsync(id);
+        if (client == null)
+            throw new Exception("Cliente no encontrado.");
+
+        // Validar si tiene facturas asociadas
+        if (client.Invoices != null && client.Invoices.Any())
+            throw new Exception("No se puede eliminar el cliente porque tiene facturas asociadas.");
+
         await _clientRepository.DeleteAsync(id);
     }
 }

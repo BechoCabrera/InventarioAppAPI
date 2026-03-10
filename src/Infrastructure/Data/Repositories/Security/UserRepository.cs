@@ -1,7 +1,7 @@
-﻿using InventarioBackend.src.Core.Domain.Security.Entities;
+﻿using System.Threading;
+using InventarioBackend.src.Core.Domain.Security.Entities;
 using InventarioBackend.src.Core.Domain.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
 {
@@ -13,6 +13,8 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
         {
             _context = context;
         }
+
+        // ===== Métodos existentes =====
 
         public async Task AddAsync(User user)
         {
@@ -39,11 +41,11 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
         public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _context.Users
-        .Include(u => u.UserRoles)
-            .ThenInclude(ur => ur.Role)
-                .ThenInclude(r => r.RolePermissions)
-                    .ThenInclude(rp => rp.Permission)
-        .FirstOrDefaultAsync(u => u.UserId == id);
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                        .ThenInclude(r => r.RolePermissions)
+                            .ThenInclude(rp => rp.Permission)
+                .FirstOrDefaultAsync(u => u.UserId == id);
         }
 
         public async Task<User?> GetByUsernameAsync(string username, string pass)
@@ -66,5 +68,28 @@ namespace InventarioBackend.src.Infrastructure.Data.Repositories.Security
             }
         }
 
+        // ===== NUEVOS MÉTODOS para UserService (lista/crear con token) =====
+
+        public async Task<List<User>> GetAllAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
+        // Sobrecarga con CancellationToken que NO guarda aún
+        public async Task AddAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            await _context.Users.AddAsync(user, cancellationToken);
+        }
+
+        public Task SaveChangesAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             var invoice = dto.Adapt<Invoice>();
 
             invoice.InvoiceNumber = await _consecutiveSettingsService
-                .GetNextConsecutiveAsync("ConsecutivoFactura");
+                .GetNextConsecutiveAsync();
 
             invoice.DueDate = DateTime.Now;
             invoice.IssueDate = DateTime.Now;
@@ -181,9 +181,9 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
 
             return invoices.Adapt<List<InvoiceDto>>();
         }
-        public async Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string number)
+        public async Task<List<InvoiceDto>> GetInvoicesByNumberAsync(string number, bool isCancelled, Guid entitiId)
         {
-            var result = await _repository.GetInvoicesByNumberAsync(number);
+            var result = await _repository.GetInvoicesByNumberAsync(number, isCancelled, entitiId);
             return result.Adapt<List<InvoiceDto>>();
         }
         public async Task<List<InvoiceDto>> GetInvoicesByFiltersAsync(SearchInvoiceRequest data, Guid entitiId)

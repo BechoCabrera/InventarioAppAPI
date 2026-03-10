@@ -126,6 +126,15 @@ builder.Services.AddScoped<IInvoiceCancellationRepository, InvoiceCancellationRe
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+
+
 builder.Services.AddHttpContextAccessor();
 
 // ================= Mapster ======================

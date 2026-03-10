@@ -50,17 +50,27 @@ namespace InventarioBackend.src.Host.Controllers
         public async Task<ActionResult> Create(ProductCreateDto dto)
         {
             var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            if(role == "vaneaf")
+            if (role == "vaneaf")
             {
-                return NotFound("Usted no tiene acceso a esta funcion.");
+                // Retorna mensaje en JSON
+                return NotFound(new { message = "Usted no tiene acceso a esta función." });
             }
 
             var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
             if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
             dto.EntitiId = Guid.Parse(entitiIdClaim);
 
-            var id = await _productService.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id }, null);
+            // Aquí asumo que tu servicio lanza una excepción si el código de barras ya existe.
+            try
+            {
+                var id = await _productService.CreateAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id }, null);
+            }
+            catch (Exception ex)
+            {
+                // Excepción personalizada para código de barras duplicado
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

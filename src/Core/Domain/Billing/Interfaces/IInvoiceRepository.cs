@@ -6,7 +6,7 @@ namespace InventarioBackend.Core.Domain.Billing.Interfaces
     public interface IInvoiceRepository
     {
         Task<List<Invoice>> GetAllAsync();
-        Task<List<Invoice>> GetInvoicesByNumberAsync(string number);
+        Task<List<Invoice>> GetInvoicesByNumberAsync(string number, bool isCancelled, Guid entitiId);
         Task<List<Invoice>> GetByEntitiAsync(Guid id);
         Task<Invoice?> GetByIdAsync(Guid id);
         Task<Invoice> AddAsync(Invoice invoice);       

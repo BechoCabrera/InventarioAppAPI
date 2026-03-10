@@ -4,6 +4,7 @@
     {
         public Guid PromotionId { get; set; }
         public string Name { get; set; }
+        public string? ProductName { get; set; }
         public int Type { get; set; } // O PromotionType si quieres el enum
         public decimal Percentage { get; set; }
         public int? MinQuantity { get; set; }

@@ -18,7 +18,9 @@ public class ClientRepository : IClientRepository
 
     public async Task<Client?> GetByIdAsync(Guid id)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet
+         .Include(c => c.Invoices)
+         .FirstOrDefaultAsync(c => c.ClientId == id);
     }
     public async Task<List<Client>> GetByEntitiAsync(Guid entitiId)
     {

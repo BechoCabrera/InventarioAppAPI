@@ -71,5 +71,19 @@ public class ClientsController : ControllerBase
             return StatusCode(500, ex.Message);  // Manejo de errores
         }
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await _service.DeleteAsync(id);
+            return Ok(new { message = "Cliente eliminado correctamente." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
     // Agrega Update, Delete, GetById igual que en ProductsController
 }

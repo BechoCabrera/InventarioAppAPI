@@ -92,10 +92,10 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 .ToListAsync();
         }
 
-        public async Task<List<Invoice>> GetInvoicesByNumberAsync(string number)
+        public async Task<List<Invoice>> GetInvoicesByNumberAsync(string number, bool isCancelled, Guid entitiId)
         {
             return await _context.Invoices
-                         .Where(i => i.InvoiceNumber.StartsWith(number) && i.isCancelled == false)
+                         .Where(i => i.InvoiceNumber.StartsWith(number) && i.isCancelled == isCancelled && i.EntitiId == entitiId)
                          .Include(i => i.Client)
                          .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)// Filtra por el prefijo del número de factura
                          .ToListAsync();

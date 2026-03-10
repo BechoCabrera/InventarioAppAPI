@@ -20,7 +20,6 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Permission> Permissions => Set<Permission>();
-        public DbSet<UserRole> UserRole => Set<UserRole>();
         public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<UserRole> UserRoles => Set<UserRole>();

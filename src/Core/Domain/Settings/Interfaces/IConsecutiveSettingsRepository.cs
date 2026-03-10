@@ -4,7 +4,7 @@ namespace InventarioBackend.src.Core.Domain.Settings.Interfaces
 {
     public interface IConsecutiveSettingsRepository
     {
-        Task<ConsecutiveSettings?> GetByNameAsync(string name);
+        Task<ConsecutiveSettings?> GetByNameAsync();
         Task UpdateAsync(ConsecutiveSettings settings);
     }
 }

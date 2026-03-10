@@ -53,5 +53,55 @@ namespace InventarioBackend.src.Core.Application.Security.Services
 
             return dto;
         }
+
+        public async Task<IEnumerable<UserListDto>> GetAllAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var users = await _userRepository.GetAllAsync(cancellationToken);
+
+            return users.Select(u => new UserListDto
+            {
+                UserId = u.UserId,
+                EntitiId = u.EntitiId,
+                Username = u.Username,
+                Name = u.Name ?? u.Username,
+                Email = u.Email,
+                Avatar = u.Avatar,
+                IsActive = u.IsActive
+            });
+        }
+        public async Task<UserListDto> CreateAsync(
+            CreateUserRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var entity = new User
+            {
+                UserId = Guid.NewGuid(),
+                EntitiId = request.EntitiId,
+                Username = request.Username,
+                Name = request.Name,
+                Email = request.Email,
+                PasswordHash = request.PasswordHash,
+                Avatar = request.Avatar,
+                IsActive = request.IsActive,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _userRepository.AddAsync(entity, cancellationToken);
+            await _userRepository.SaveChangesAsync(cancellationToken);
+
+            return new UserListDto
+            {
+                UserId = entity.UserId,
+                EntitiId = entity.EntitiId,
+                Username = entity.Username,
+                Name = entity.Name ?? entity.Username,
+                Email = entity.Email,
+                Avatar = entity.Avatar,
+                IsActive = entity.IsActive
+            };
+        }
     }
 }
+

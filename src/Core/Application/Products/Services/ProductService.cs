@@ -3,6 +3,7 @@ using InventarioBackend.src.Core.Application.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Products;
 using InventarioBackend.src.Core.Domain.Products.Interfaces;
 using InventarioBackend.src.Core.Domain.Promotions.Interfaces;
+using InventarioBackend.src.Infrastructure.Data.Repositories.Products;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -158,23 +159,36 @@ namespace InventarioBackend.src.Core.Application.Products.Services
 
         public async Task<Guid> CreateAsync(ProductCreateDto dto)
         {
-            var product = dto.Adapt<Product>();
-            string? user = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (user != null)
+            try
             {
-                if (Guid.TryParse(user, out var parsedGuid))
+                var product = dto.Adapt<Product>();
+                string? user = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (user != null)
                 {
-                    product.RegUserId = parsedGuid;
-                    product.StockSold = 0;
+                    if (Guid.TryParse(user, out var parsedGuid))
+                    {
+                        product.RegUserId = parsedGuid;
+                        product.StockSold = dto.Stock;
+                    }
+                    product.Name = dto.Name.Trim();
+
+                    var varCodeExist = await _productRepository.GetByBarCodeAsync(dto.BarCode, dto.EntitiId.Value);
+                    if (varCodeExist != null)
+                        throw new Exception("No es posible guardar este producto, este codigo de barra ya existe con el nombre de: " + varCodeExist.Name + " - " + varCodeExist.BarCode);
+
+                    await _productRepository.AddAsync(product);
+                    return product.ProductId;
                 }
-                product.Name = dto.Name.Trim();
-                await _productRepository.AddAsync(product);
-                return product.ProductId;
+                else
+                {
+                    throw new Exception("Inicio de sesion finalizada, no se pudo completar la operacion.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("Inicio de sesion finalizada, no se pudo completar la operacion.");
+                throw new Exception(ex.Message);
             }
+
 
         }
 

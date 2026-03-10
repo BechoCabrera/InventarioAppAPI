@@ -57,6 +57,7 @@
 
   <ItemGroup>
     <None Include="InventarioBackend.sln" />
+    <None Include="src\Core\Application\Security\Interfaces\IRoleService.cs" />
   </ItemGroup>
 
   <ItemGroup>

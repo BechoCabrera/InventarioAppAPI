@@ -14,11 +14,11 @@ namespace InventarioBackend.src.Core.Application.Settings.Services
         /// <summary>
         /// Obtiene y genera el siguiente consecutivo para un nombre dado (ej. "ConsecutivoFactura")
         /// </summary>
-        public async Task<string> GetNextConsecutiveAsync(string name)
+        public async Task<string> GetNextConsecutiveAsync()
         {
-            var settings = await _repository.GetByNameAsync(name);
+            var settings = await _repository.GetByNameAsync();
             if (settings == null)
-                throw new Exception($"Consecutive settings not found for '{name}'");
+                throw new Exception("Error al generar la factura.");
 
             string nextNumber = settings.GenerateNextNumber();
 

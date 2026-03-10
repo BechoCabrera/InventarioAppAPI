@@ -98,15 +98,18 @@ namespace InventarioBackend.Host.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<List<InvoiceDto>>> SearchInvoice([FromQuery] string number)
+        public async Task<ActionResult<List<InvoiceDto>>> SearchInvoice([FromQuery] string number, bool includeAnulations = false)
         {
             if (string.IsNullOrWhiteSpace(number))
             {
                 return BadRequest("El número de factura no puede estar vacío.");
             }
+            var entitiIdClaim = User.Claims.FirstOrDefault(c => c.Type == "entiti_id")?.Value;
+            if (string.IsNullOrEmpty(entitiIdClaim)) return Unauthorized();
 
+            Guid entitiId = Guid.Parse(entitiIdClaim);
             // Usa el servicio para obtener las facturas
-            var invoices = await _invoiceService.GetInvoicesByNumberAsync(number);
+            var invoices = await _invoiceService.GetInvoicesByNumberAsync(number, includeAnulations, entitiId);
 
             return Ok(invoices);
         }
