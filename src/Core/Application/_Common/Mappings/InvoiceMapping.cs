@@ -20,6 +20,9 @@ namespace InventarioBackend.Core.Application._Common.Mappings
                 .Map(dest => dest.ProductName, src => src.Product.Name);
             config.NewConfig<InvoiceDetailDto, InvoiceDetail>();
 
+            config.NewConfig<InvoicePayment, InvoicePaymentDto>();
+            config.NewConfig<InvoicePaymentDto, InvoicePayment>();
+
             config.NewConfig<InvoiceCreateDto, Invoice>();
             config.NewConfig<InvoiceDetailCreateDto, InvoiceDetail>();
 

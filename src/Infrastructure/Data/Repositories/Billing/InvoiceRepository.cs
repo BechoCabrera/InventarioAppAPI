@@ -25,6 +25,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         {
             return await _dbSet
                 .Include(i => i.Client)
+                .Include(i => i.PaymentBreakdown)
                 .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)
                 .ToListAsync();
         }
@@ -34,6 +35,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             try
             {
                 return await _dbSet.Where(a => a.EntitiId == id)
+               .Include(i => i.PaymentBreakdown)
                //.Include(i => i.Client).AsSingleQuery()
                //.Include(i => i.EntitiConfigs).AsSingleQuery()
                //.Include(i => i.Details).ThenInclude(d => d.Product).AsSingleQuery().OrderByDescending(a => a.DueDate)
@@ -50,6 +52,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         {
             return await _dbSet
                 .Include(i => i.Client)
+                .Include(i => i.PaymentBreakdown)
                 .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
         }
@@ -88,6 +91,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
         public async Task<List<Invoice>> GetInvoicesByDateAsync(DateTime date, Guid entitiId)
         {
             return await _context.Invoices
+                .Include(i => i.PaymentBreakdown)
                 .Where(invoice => invoice.CreatedAt.Date == date.Date && invoice.EntitiId == entitiId && invoice.isCancelled == false)
                 .ToListAsync();
         }
@@ -97,6 +101,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
             return await _context.Invoices
                          .Where(i => i.InvoiceNumber.StartsWith(number) && i.isCancelled == isCancelled && i.EntitiId == entitiId)
                          .Include(i => i.Client)
+                         .Include(i => i.PaymentBreakdown)
                          .Include(i => i.Details).ThenInclude(d => d.Product).Include(i => i.EntitiConfigs)// Filtra por el prefijo del número de factura
                          .ToListAsync();
         }
@@ -106,6 +111,7 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 .Where(i => i.EntitiId == entitiId)
                 .AsNoTracking() // <- Mejora rendimiento (solo lectura)
                 .Include(i => i.Client)
+                .Include(i => i.PaymentBreakdown)
                 .Include(i => i.Details).ThenInclude(d => d.Product)
                 .Include(i => i.EntitiConfigs);
 
@@ -127,8 +133,12 @@ namespace InventarioBackend.Infrastructure.Data.Repositories.Billing
                 query = query.Where(i => i.IssueDate <= data.EndDate.Value);
            
             if (!string.IsNullOrWhiteSpace(data.PaymentMethod))
-                query = query.Where(i => i.PaymentMethod != null &&
-                                         EF.Functions.Like(i.PaymentMethod.ToLower(), data.PaymentMethod.ToLower()));
+            {
+                var paymentMethod = data.PaymentMethod.Trim().ToLower();
+                query = query.Where(i =>
+                    (i.PaymentMethod != null && EF.Functions.Like(i.PaymentMethod.ToLower(), paymentMethod)) ||
+                    i.PaymentBreakdown.Any(p => EF.Functions.Like(p.PaymentMethod.ToLower(), paymentMethod)));
+            }
 
             if (data.IsCancelled.HasValue)
                 query = query.Where(i => i.isCancelled == data.IsCancelled.Value);

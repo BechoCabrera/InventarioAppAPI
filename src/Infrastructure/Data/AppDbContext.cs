@@ -30,6 +30,7 @@ namespace InventarioBackend.src.Infrastructure.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
+        public DbSet<InvoicePayment> InvoicePayments { get; set; }
         public DbSet<ConsecutiveSettings> ConsecutiveSettings { get; set; }
         public DbSet<EntitiConfig> EntitiConfigs { get; set; }
         public DbSet<CashClosing> CashClosings { get; set; }
@@ -133,6 +134,24 @@ namespace InventarioBackend.src.Infrastructure.Data
                 .WithOne(d => d.Invoice)
                 .HasForeignKey(d => d.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Invoice>()
+                .HasMany(i => i.PaymentBreakdown)
+                .WithOne(p => p.Invoice)
+                .HasForeignKey(p => p.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InvoicePayment>()
+                .ToTable("InvoicePayments");
+
+            modelBuilder.Entity<InvoicePayment>()
+                .Property(p => p.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<InvoicePayment>()
+                .Property(p => p.PaymentMethod)
+                .HasMaxLength(50)
+                .IsRequired();
 
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Client)

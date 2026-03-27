@@ -83,6 +83,25 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
         {
             var invoice = dto.Adapt<Invoice>();
 
+            if (invoice.PaymentBreakdown == null)
+            {
+                invoice.PaymentBreakdown = new List<InvoicePayment>();
+            }
+
+            // Si viene multipago, normalizamos por método y validamos montos contra el total.
+            if (invoice.PaymentBreakdown.Count > 0)
+            {
+                invoice.PaymentBreakdown = invoice.PaymentBreakdown
+                    .Where(p => p.Amount > 0 && !string.IsNullOrWhiteSpace(p.PaymentMethod))
+                    .GroupBy(p => p.PaymentMethod.Trim())
+                    .Select(g => new InvoicePayment
+                    {
+                        PaymentMethod = g.Key,
+                        Amount = g.Sum(x => x.Amount),
+                    })
+                    .ToList();
+            }
+
             invoice.InvoiceNumber = await _consecutiveSettingsService
                 .GetNextConsecutiveAsync();
 
@@ -118,6 +137,23 @@ namespace InventarioBackend.src.Core.Application.Billing.Services
             invoice.SubtotalAmount = subtotal;
             //invoice.TaxAmount = subtotalWithDiscount; // IVA
             invoice.TotalAmount = subtotalWithDiscount + invoice.TaxAmount;
+
+            if (string.Equals(invoice.PaymentMethod, "MultiPago", StringComparison.OrdinalIgnoreCase)
+                && invoice.PaymentBreakdown.Count == 0)
+            {
+                throw new InvalidOperationException("Debe enviar el desglose de pagos cuando el método de pago es MultiPago.");
+            }
+
+            if (invoice.PaymentBreakdown.Count > 0)
+            {
+                var breakdownTotal = invoice.PaymentBreakdown.Sum(p => p.Amount);
+                if (decimal.Round(breakdownTotal, 2) != decimal.Round(invoice.TotalAmount, 2))
+                {
+                    throw new InvalidOperationException("La suma del desglose de pagos debe ser igual al total de la factura.");
+                }
+
+                invoice.PaymentMethod = "MultiPago";
+            }
 
             Invoice savedInvoice = null!;
 
